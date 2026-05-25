@@ -85,10 +85,10 @@ const s = {
     zIndex: 10,
   },
   card: {
-    background: 'rgba(23,19,46,0.88)',
-    backdropFilter: 'blur(24px)',
-    WebkitBackdropFilter: 'blur(24px)',
-    border: '1px solid rgba(212,160,23,0.28)',
+    background: 'rgba(23,19,46,0.35)',
+    backdropFilter: 'blur(32px) saturate(180%)',
+    WebkitBackdropFilter: 'blur(32px) saturate(180%)',
+    border: '1px solid rgba(255,255,255,0.15)',
     borderRadius: 24,
     padding: '40px 36px',
     width: '100%',
@@ -97,7 +97,7 @@ const s = {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    boxShadow: '0 24px 64px rgba(0,0,0,0.55)',
+    boxShadow: '0 24px 64px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1)',
   },
   logoWrap: {
     width: 100, height: 100,
