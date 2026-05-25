@@ -4,7 +4,7 @@ const ADMIN_PASSWORD = 'Bond442@love1'
 
 // ── GESA logo from Cloudinary — no local file needed ──
 // Replace with your actual Cloudinary URL after uploading the logo once
-const LOGO_URL = 'https://res.cloudinary.com/df9ns044o/image/upload/gesa/photos/gesa-logo'
+const LOGO_URL = 'https://res.cloudinary.com/df9ns044o/image/upload/v1779677619/gesa-logo_am7hpu.jpg'
 
 export default function LoginPage({ onLogin }) {
   const [pwd, setPwd]         = useState('')

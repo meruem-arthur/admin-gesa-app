@@ -17,7 +17,7 @@ const NAV = [
 // ── GESA logo hosted on Cloudinary — no local file needed ──
 // Replace this URL with the actual Cloudinary URL of your GESA logo
 // after you upload it once to cloudinary.com
-const LOGO_URL = 'https://res.cloudinary.com/df9ns044o/image/upload/gesa/photos/gesa-logo'
+const LOGO_URL = 'https://res.cloudinary.com/df9ns044o/image/upload/v1779677619/gesa-logo_am7hpu.jpg'
 
 export default function Sidebar({ onLogout }) {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
