@@ -1,102 +1,197 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { NavLink } from 'react-router-dom'
+import gesaLogo from '../assets/gesa-logo.jpg'
 
 const NAV = [
-  { to: '/',             icon: '📊', label: 'Dashboard'     },
-  { to: '/executives',   icon: '🎖️', label: 'Executives'    },
-  { to: '/lecturers',    icon: '🎓', label: 'Lecturers'     },
-  { to: '/events',       icon: '📅', label: 'Events'        },
-  { to: '/announcements',icon: '📢', label: 'Announcements' },
-  { to: '/words',        icon: '📖', label: 'Word of Day'   },
-  { to: '/materials',    icon: '📚', label: 'Materials'     },
-  { to: '/pastquestions',icon: '📄', label: 'Past Questions'},
-  { to: '/exams',        icon: '⏰', label: 'Exams'         },
-  { to: '/notifications',icon: '🔔', label: 'Notifications' },
+  { to: '/',              icon: '📊', label: 'Dashboard'      },
+  { to: '/executives',    icon: '🎖️', label: 'Executives'     },
+  { to: '/lecturers',     icon: '🎓', label: 'Lecturers'      },
+  { to: '/events',        icon: '📅', label: 'Events'         },
+  { to: '/announcements', icon: '📢', label: 'Announcements'  },
+  { to: '/words',         icon: '📖', label: 'Word of Day'    },
+  { to: '/materials',     icon: '📚', label: 'Materials'      },
+  { to: '/pastquestions', icon: '📄', label: 'Past Questions' },
+  { to: '/exams',         icon: '⏰', label: 'Exams'          },
+  { to: '/notifications', icon: '🔔', label: 'Notifications'  },
 ]
 
 export default function Sidebar({ onLogout }) {
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
+  const [open, setOpen]         = useState(false)
+
+  useEffect(() => {
+    function handleResize() {
+      const mobile = window.innerWidth < 768
+      setIsMobile(mobile)
+      if (!mobile) setOpen(false) // reset when going back to desktop
+    }
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
+  // Close sidebar when clicking a nav link on mobile
+  function handleNavClick() {
+    if (isMobile) setOpen(false)
+  }
+
+  const sidebarVisible = !isMobile || open
+
   return (
-    <aside style={s.sidebar}>
-      {/* Logo */}
-      <div style={s.logo}>
-        <div style={s.logoIcon}>GE<span style={{ color: '#e8b82a' }}>SA</span></div>
-        <div>
-          <div style={s.logoTitle}>GESA Admin</div>
-          <div style={s.logoSub}>UMaT · Essikado</div>
-        </div>
-      </div>
+    <>
+      {/* ── Hamburger button — mobile only ── */}
+      {isMobile && (
+        <button style={s.hamburger} onClick={() => setOpen(v => !v)} aria-label="Toggle menu">
+          {open ? '✕' : '☰'}
+        </button>
+      )}
 
-      {/* Nav */}
-      <nav style={s.nav}>
-        {NAV.map(item => (
-          <NavLink
-            key={item.to}
-            to={item.to}
-            end={item.to === '/'}
-            style={({ isActive }) => ({ ...s.link, ...(isActive ? s.linkActive : {}) })}
-          >
-            <span style={s.linkIcon}>{item.icon}</span>
-            {item.label}
-          </NavLink>
-        ))}
-      </nav>
+      {/* ── Backdrop — mobile only, closes sidebar when tapped ── */}
+      {isMobile && open && (
+        <div style={s.backdrop} onClick={() => setOpen(false)} />
+      )}
 
-      {/* Logout */}
-      <button style={s.logout} onClick={onLogout}>
-        🚪 Log out
-      </button>
-    </aside>
+      {/* ── Sidebar ── */}
+      {sidebarVisible && (
+        <aside style={{ ...s.sidebar, ...(isMobile ? s.sidebarMobile : {}) }}>
+          {/* Logo */}
+          <div style={s.logo}>
+            <div style={s.logoImgWrap}>
+              <img src={gesaLogo} alt="GESA" style={s.logoImg} />
+            </div>
+            <div>
+              <div style={s.logoTitle}>GESA Admin</div>
+              <div style={s.logoSub}>UMaT · Essikado</div>
+            </div>
+            {/* Close button inside sidebar on mobile */}
+            {isMobile && (
+              <button style={s.closeBtn} onClick={() => setOpen(false)}>✕</button>
+            )}
+          </div>
+
+          {/* Nav links */}
+          <nav style={s.nav}>
+            {NAV.map(item => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                end={item.to === '/'}
+                onClick={handleNavClick}
+                style={({ isActive }) => ({
+                  ...s.link,
+                  ...(isActive ? s.linkActive : {}),
+                })}
+              >
+                <span style={s.linkIcon}>{item.icon}</span>
+                {item.label}
+              </NavLink>
+            ))}
+          </nav>
+
+          {/* Logout */}
+          <button style={s.logout} onClick={onLogout}>
+            🚪 Log out
+          </button>
+        </aside>
+      )}
+    </>
   )
 }
 
 const s = {
+  /* Desktop sidebar */
   sidebar: {
     width: 220,
     minHeight: '100vh',
-    background: '#0f0c22',
+    background: 'rgba(15,12,34,0.82)',
+    backdropFilter: 'blur(16px)',
+    WebkitBackdropFilter: 'blur(16px)',
     borderRight: '1px solid rgba(180,130,255,0.13)',
     display: 'flex',
     flexDirection: 'column',
     padding: '24px 12px',
     flexShrink: 0,
+    zIndex: 100,
   },
-  logo: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 12,
-    padding: '0 8px 24px',
-    borderBottom: '1px solid rgba(180,130,255,0.13)',
-    marginBottom: 16,
+  /* Mobile sidebar — fixed overlay */
+  sidebarMobile: {
+    position: 'fixed',
+    top: 0, left: 0,
+    height: '100vh',
+    zIndex: 200,
+    boxShadow: '4px 0 32px rgba(0,0,0,0.5)',
   },
-  logoIcon: {
+  /* Hamburger */
+  hamburger: {
+    position: 'fixed',
+    top: 16, left: 16,
+    zIndex: 300,
     width: 40, height: 40,
-    background: '#5b21b6',
     borderRadius: 10,
+    background: 'rgba(23,19,46,0.9)',
+    backdropFilter: 'blur(8px)',
+    border: '1px solid rgba(212,160,23,0.3)',
+    color: '#e8b82a',
+    fontSize: 18,
+    cursor: 'pointer',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    fontSize: 14, fontWeight: 800, color: '#fff',
-    border: '1px solid rgba(212,160,23,0.3)',
+  },
+  /* Backdrop */
+  backdrop: {
+    position: 'fixed',
+    inset: 0,
+    background: 'rgba(0,0,0,0.55)',
+    zIndex: 150,
+  },
+  /* Close button inside sidebar */
+  closeBtn: {
+    marginLeft: 'auto',
+    background: 'transparent',
+    border: 'none',
+    color: '#9b8ec0',
+    fontSize: 16,
+    cursor: 'pointer',
+    padding: 4,
+  },
+  /* Logo area */
+  logo: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 10,
+    padding: '0 8px 20px',
+    borderBottom: '1px solid rgba(180,130,255,0.13)',
+    marginBottom: 14,
+  },
+  logoImgWrap: {
+    width: 38, height: 38,
+    borderRadius: 19,
+    overflow: 'hidden',
+    border: '2px solid rgba(212,160,23,0.4)',
+    backgroundColor: '#fff',
     flexShrink: 0,
   },
-  logoTitle: { fontSize: 14, fontWeight: 700, color: '#f0ecff' },
-  logoSub:   { fontSize: 11, color: '#584f7a', marginTop: 1 },
-  nav: { flex: 1, display: 'flex', flexDirection: 'column', gap: 2 },
+  logoImg:   { width: '100%', height: '100%', objectFit: 'cover' },
+  logoTitle: { fontSize: 13, fontWeight: 700, color: '#f0ecff' },
+  logoSub:   { fontSize: 10, color: '#584f7a', marginTop: 1 },
+  /* Nav */
+  nav:  { flex: 1, display: 'flex', flexDirection: 'column', gap: 2, overflowY: 'auto' },
   link: {
     display: 'flex', alignItems: 'center', gap: 10,
     padding: '9px 12px', borderRadius: 10,
     fontSize: 13, color: '#9b8ec0',
     transition: 'all 0.15s',
     textDecoration: 'none',
+    whiteSpace: 'nowrap',
   },
   linkActive: {
     background: 'rgba(212,160,23,0.1)',
     color: '#e8b82a',
     fontWeight: 600,
   },
-  linkIcon: { fontSize: 16, width: 20, textAlign: 'center' },
+  linkIcon: { fontSize: 16, width: 22, textAlign: 'center', flexShrink: 0 },
   logout: {
-    marginTop: 16,
+    marginTop: 14,
     padding: '9px 12px',
     borderRadius: 10,
     background: 'rgba(248,113,113,0.08)',
@@ -105,5 +200,6 @@ const s = {
     fontSize: 13,
     cursor: 'pointer',
     textAlign: 'left',
+    whiteSpace: 'nowrap',
   },
 }

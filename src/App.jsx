@@ -21,13 +21,12 @@ export default function App() {
   function handleLogout() { sessionStorage.removeItem('gesa_admin');   setAuthed(false) }
 
   return (
-    // Root wrapper — position relative so wave sits behind everything
     <div style={{ position: 'relative', minHeight: '100vh' }}>
 
-      {/* ── Wave canvas — fixed, behind everything, global ── */}
+      {/* Wave — fixed behind everything */}
       <WaveBackground />
 
-      {/* ── App content — sits above the wave ── */}
+      {/* App content */}
       <div style={{ position: 'relative', zIndex: 1, display: 'flex', minHeight: '100vh' }}>
         {!authed
           ? <LoginPage onLogin={handleLogin} />
@@ -36,10 +35,12 @@ export default function App() {
               <Sidebar onLogout={handleLogout} />
               <main style={{
                 flex: 1,
-                padding: '32px',
+                padding: '24px',
                 overflowY: 'auto',
-                // Transparent so the wave shows through
                 background: 'transparent',
+                // On mobile leave space for the hamburger button
+                paddingTop: window.innerWidth < 768 ? '72px' : '32px',
+                minWidth: 0, // prevents overflow
               }}>
                 <Routes>
                   <Route path="/"              element={<Dashboard />} />

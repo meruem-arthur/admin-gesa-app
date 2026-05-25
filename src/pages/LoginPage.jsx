@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
+import gesaLogo from '../assets/gesa-logo.jpg'
 
 const ADMIN_PASSWORD = 'Bond442@love1'
 
 export default function LoginPage({ onLogin }) {
-  const [pwd, setPwd] = useState('')
-  const [err, setErr] = useState('')
+  const [pwd, setPwd]         = useState('')
+  const [err, setErr]         = useState('')
   const [loading, setLoading] = useState(false)
 
   function handleSubmit(e) {
@@ -20,13 +21,14 @@ export default function LoginPage({ onLogin }) {
     <div style={s.page}>
       <div style={s.card}>
         {/* Logo */}
-        <div style={s.logoBox}>
-          <span style={s.logo}>GE<span style={{ color: '#e8b82a' }}>SA</span></span>
+        <div style={s.logoWrap}>
+          <img src={gesaLogo} alt="GESA" style={s.logo} />
         </div>
+
         <h1 style={s.title}>GESA Admin Dashboard</h1>
         <p style={s.sub}>Geomatic Engineering Students Association · UMaT</p>
 
-        <form onSubmit={handleSubmit} style={{ marginTop: 32 }}>
+        <form onSubmit={handleSubmit} style={{ marginTop: 28, width: '100%' }}>
           <div className="form-group">
             <label>Admin Password</label>
             <input
@@ -38,7 +40,12 @@ export default function LoginPage({ onLogin }) {
             />
             {err && <p style={s.err}>{err}</p>}
           </div>
-          <button type="submit" className="btn btn-gold" style={{ width: '100%', justifyContent: 'center', marginTop: 8 }} disabled={loading}>
+          <button
+            type="submit"
+            className="btn btn-gold"
+            style={{ width: '100%', justifyContent: 'center', marginTop: 8, padding: 13 }}
+            disabled={loading}
+          >
             {loading ? <span className="spinner" /> : '🔓 Unlock Dashboard'}
           </button>
         </form>
@@ -50,12 +57,43 @@ export default function LoginPage({ onLogin }) {
 }
 
 const s = {
-  page:    { minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg)', padding: 24 },
-  card:    { background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 20, padding: '40px 36px', width: '100%', maxWidth: 400, textAlign: 'center' },
-  logoBox: { marginBottom: 16 },
-  logo:    { fontSize: 32, fontWeight: 800, color: '#fff' },
-  title:   { fontSize: 20, fontWeight: 700, color: 'var(--text)', marginTop: 12 },
-  sub:     { fontSize: 13, color: 'var(--muted)', marginTop: 6 },
-  err:     { color: 'var(--red)', fontSize: 12, marginTop: 6, textAlign: 'left' },
-  hint:    { fontSize: 11, color: 'var(--dim)', marginTop: 28 },
+  page: {
+    position: 'fixed',
+    inset: 0,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    background: 'transparent',
+    padding: 24,
+    zIndex: 10,
+  },
+  card: {
+    background: 'rgba(23,19,46,0.88)',
+    backdropFilter: 'blur(24px)',
+    WebkitBackdropFilter: 'blur(24px)',
+    border: '1px solid rgba(212,160,23,0.28)',
+    borderRadius: 24,
+    padding: '40px 36px',
+    width: '100%',
+    maxWidth: 420,
+    textAlign: 'center',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    boxShadow: '0 24px 64px rgba(0,0,0,0.55)',
+  },
+  logoWrap: {
+    width: 100, height: 100,
+    borderRadius: 50,
+    overflow: 'hidden',
+    border: '3px solid rgba(212,160,23,0.5)',
+    marginBottom: 20,
+    backgroundColor: '#fff',
+    flexShrink: 0,
+  },
+  logo:  { width: '100%', height: '100%', objectFit: 'cover' },
+  title: { fontSize: 20, fontWeight: 800, color: '#f0ecff', margin: 0 },
+  sub:   { fontSize: 13, color: '#9b8ec0', marginTop: 6 },
+  err:   { color: '#f87171', fontSize: 12, marginTop: 6, textAlign: 'left' },
+  hint:  { fontSize: 11, color: '#584f7a', marginTop: 28 },
 }
