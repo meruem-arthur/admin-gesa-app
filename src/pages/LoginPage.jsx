@@ -1,12 +1,16 @@
 import React, { useState } from 'react'
-import gesaLogo from '../assets/gesa-logo.jpg'
 
 const ADMIN_PASSWORD = 'Bond442@love1'
+
+// ── GESA logo from Cloudinary — no local file needed ──
+// Replace with your actual Cloudinary URL after uploading the logo once
+const LOGO_URL = 'https://res.cloudinary.com/df9ns044o/image/upload/gesa/photos/gesa-logo'
 
 export default function LoginPage({ onLogin }) {
   const [pwd, setPwd]         = useState('')
   const [err, setErr]         = useState('')
   const [loading, setLoading] = useState(false)
+  const [imgError, setImgError] = useState(false)
 
   function handleSubmit(e) {
     e.preventDefault()
@@ -20,9 +24,22 @@ export default function LoginPage({ onLogin }) {
   return (
     <div style={s.page}>
       <div style={s.card}>
+
         {/* Logo */}
         <div style={s.logoWrap}>
-          <img src={gesaLogo} alt="GESA" style={s.logo} />
+          {!imgError ? (
+            <img
+              src={LOGO_URL}
+              alt="GESA"
+              style={s.logoImg}
+              onError={() => setImgError(true)}
+            />
+          ) : (
+            // Fallback if image not uploaded yet
+            <div style={s.logoFallback}>
+              GE<span style={{ color: '#e8b82a' }}>SA</span>
+            </div>
+          )}
         </div>
 
         <h1 style={s.title}>GESA Admin Dashboard</h1>
@@ -88,10 +105,14 @@ const s = {
     overflow: 'hidden',
     border: '3px solid rgba(212,160,23,0.5)',
     marginBottom: 20,
-    backgroundColor: '#fff',
+    backgroundColor: '#5b21b6',
     flexShrink: 0,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  logo:  { width: '100%', height: '100%', objectFit: 'cover' },
+  logoImg:      { width: '100%', height: '100%', objectFit: 'cover' },
+  logoFallback: { fontSize: 24, fontWeight: 800, color: '#fff' },
   title: { fontSize: 20, fontWeight: 800, color: '#f0ecff', margin: 0 },
   sub:   { fontSize: 13, color: '#9b8ec0', marginTop: 6 },
   err:   { color: '#f87171', fontSize: 12, marginTop: 6, textAlign: 'left' },
