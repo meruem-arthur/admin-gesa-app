@@ -13,6 +13,7 @@ import MaterialsPage     from './pages/MaterialsPage'
 import PastQPage         from './pages/PastQPage'
 import ExamsPage         from './pages/ExamsPage'
 import NotificationsPage from './pages/NotificationsPage'
+import ForumPage        from './pages/ForumPage'
 
 export default function App() {
   const [authed, setAuthed] = useState(() => sessionStorage.getItem('gesa_admin') === '1')
@@ -53,6 +54,7 @@ export default function App() {
                   <Route path="/pastquestions" element={<PastQPage />} />
                   <Route path="/exams"         element={<ExamsPage />} />
                   <Route path="/notifications" element={<NotificationsPage />} />
+                  <Route path="/forum"         element={<ForumPage />} />
                   <Route path="*"              element={<Navigate to="/" />} />
                 </Routes>
               </main>

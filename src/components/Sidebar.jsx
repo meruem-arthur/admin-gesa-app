@@ -12,6 +12,7 @@ const NAV = [
   { to: '/pastquestions', icon: '📄', label: 'Past Questions' },
   { to: '/exams',         icon: '⏰', label: 'Exams'          },
   { to: '/notifications', icon: '🔔', label: 'Notifications'  },
+  { to: '/forum',         icon: '💬', label: 'Forum'          },
 ]
 
 // ── GESA logo hosted on Cloudinary — no local file needed ──
