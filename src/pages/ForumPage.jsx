@@ -8,7 +8,7 @@ export default function ForumPage() {
   const [search, setSearch]   = useState('')
 
   useEffect(() => {
-    const unsub = onSnapshot(collection(db, 'forum_posts'), snap => {
+    const unsub = onSnapshot(collection(db, 'forum'), snap => {
       const data = snap.docs.map(d => ({ id: d.id, ...d.data() }))
       // Sort newest first
       data.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0))
@@ -20,16 +20,17 @@ export default function ForumPage() {
 
   async function handleDelete(id) {
     if (!window.confirm('Delete this post?')) return
-    await deleteDoc(doc(db, 'forum_posts', id))
+    await deleteDoc(doc(db, 'forum', id))
   }
 
   async function handleTogglePin(post) {
-    await updateDoc(doc(db, 'forum_posts', post.id), { pinned: !post.pinned })
+    await updateDoc(doc(db, 'forum', post.id), { pinned: !post.pinned })
   }
 
   const filtered = posts.filter(p =>
-    (p.title || p.question || p.text || '').toLowerCase().includes(search.toLowerCase()) ||
-    (p.authorName || p.author || '').toLowerCase().includes(search.toLowerCase())
+    (p.title || p.body || '').toLowerCase().includes(search.toLowerCase()) ||
+    (p.authorName || p.author || '').toLowerCase().includes(search.toLowerCase()) ||
+    (p.tag || '').toLowerCase().includes(search.toLowerCase())
   )
 
   function formatDate(ts) {
@@ -95,18 +96,22 @@ export default function ForumPage() {
               </div>
             </div>
 
-            <p style={s.postText}>
-              {post.title || post.question || post.text || '(no content)'}
-            </p>
+            {post.tag && <span style={s.tag}>{post.tag}</span>}
 
-            {post.body && post.body !== post.title && (
+            <p style={s.postText}>{post.title || '(no title)'}</p>
+
+            {post.body && (
               <p style={s.postBody}>{post.body}</p>
             )}
 
-            {/* Replies count if available */}
-            {post.replyCount > 0 && (
-              <div style={s.replyCount}>💬 {post.replyCount} {post.replyCount === 1 ? 'reply' : 'replies'}</div>
-            )}
+            <div style={s.metaRow}>
+              {post.replyCount > 0 && (
+                <span style={s.replyCount}>💬 {post.replyCount} {post.replyCount === 1 ? 'reply' : 'replies'}</span>
+              )}
+              {post.likes > 0 && (
+                <span style={s.likes}>❤️ {post.likes} {post.likes === 1 ? 'like' : 'likes'}</span>
+              )}
+            </div>
           </div>
         ))}
       </div>
@@ -183,7 +188,19 @@ const s = {
   },
   postText: { fontSize: 14, color: '#d4cfea', margin: 0, lineHeight: 1.6, fontWeight: 600 },
   postBody: { fontSize: 13, color: '#9b8ec0', marginTop: 6, lineHeight: 1.6 },
-  replyCount: { fontSize: 12, color: '#7c6fa0', marginTop: 10 },
+  tag: {
+    display: 'inline-block',
+    fontSize: 11,
+    background: 'rgba(124,58,237,0.2)',
+    color: '#a78bfa',
+    borderRadius: 6,
+    padding: '2px 8px',
+    marginBottom: 8,
+    fontWeight: 600,
+  },
+  metaRow: { display: 'flex', gap: 14, marginTop: 10 },
+  replyCount: { fontSize: 12, color: '#7c6fa0' },
+  likes:      { fontSize: 12, color: '#f87171' },
   empty:    { color: '#9b8ec0', textAlign: 'center', marginTop: 40 },
   emptyBox: {
     textAlign: 'center',
