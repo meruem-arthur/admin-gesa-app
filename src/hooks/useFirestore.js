@@ -103,15 +103,14 @@ export async function getAllPushTokens() {
 export async function sendPushNotification(title, body) {
   const tokens = await getAllPushTokens()
   if (!tokens.length) throw new Error('No registered devices yet')
-  const messages = tokens.map(to => ({ to, sound: 'default', title, body }))
-  const chunks = []
-  for (let i = 0; i < messages.length; i += 100) chunks.push(messages.slice(i, i + 100))
-  for (const chunk of chunks) {
-    await fetch('https://exp.host/--/api/v2/push/send', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-      body: JSON.stringify(chunk),
-    })
+  const res = await fetch('/api/send-notification', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ tokens, title, body }),
+  })
+  if (!res.ok) {
+    const err = await res.json()
+    throw new Error(err.error || 'Failed to send notifications')
   }
   return tokens.length
 }
