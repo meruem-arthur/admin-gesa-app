@@ -4,7 +4,7 @@ import {
   doc, writeBatch, Timestamp, query, orderBy,
 } from 'firebase/firestore'
 import { db } from '../firebase'
-import { useToast } from '../hooks/useToast.jsx'
+import { useToast } from '../hooks/useToast.js'
 
 // ── Course code → level mapping ────────────────────────────────────────────────
 function getLevel(text) {
