@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { getExams, addExam, deleteExam } from '../hooks/useFirestore'
 import { useToast } from '../hooks/useToast'
 
-const LEVELS = ['100', '200', '300', '400', 'All']
-const EMPTY  = { courseCode: '', courseName: '', date: '', venue: '', level: 'All' }
+const EMPTY  = { title: '', startDate: '', endDate: '', note: '' }
 
 function fmtDate(val) {
   if (!val) return ''
@@ -29,7 +28,7 @@ export default function ExamsPage() {
 
   async function handleSubmit(e) {
     e.preventDefault()
-    if (!form.courseCode || !form.date) return show('Fill course code and date', 'error')
+    if (!form.title || !form.startDate) return show('Fill title and start date', 'error')
     setSaving(true)
     try {
       await addExam(form); await load(); setForm(EMPTY)
@@ -38,14 +37,14 @@ export default function ExamsPage() {
     finally { setSaving(false) }
   }
 
-  async function handleDelete(id, code) {
-    if (!confirm(`Delete ${code} exam?`)) return
+  async function handleDelete(id, title) {
+    if (!confirm(`Delete "${title}" exam?`)) return
     await deleteExam(id); await load(); show('Deleted.')
   }
 
   const now      = new Date()
-  const upcoming = list.filter(e => (e.date?.toDate ? e.date.toDate() : new Date(e.date)) >= now)
-  const past     = list.filter(e => (e.date?.toDate ? e.date.toDate() : new Date(e.date)) < now)
+  const upcoming = list.filter(e => (e.startDate?.toDate ? e.startDate.toDate() : new Date(e.startDate)) >= now)
+  const past     = list.filter(e => (e.startDate?.toDate ? e.startDate.toDate() : new Date(e.startDate)) < now)
 
   function urgencyColor(days) {
     if (days === null) return 'var(--dim)'
@@ -65,35 +64,23 @@ export default function ExamsPage() {
       <div className="card" style={{ marginBottom: 28 }}>
         <h2 style={s.formTitle}>➕ Add Exam</h2>
         <form onSubmit={handleSubmit}>
-          <div className="form-row">
-            <div className="form-group">
-              <label>Course Code *</label>
-              <input value={form.courseCode} onChange={e=>setForm(f=>({...f,courseCode:e.target.value.toUpperCase()}))} placeholder="e.g. GE 305" />
-            </div>
-            <div className="form-group">
-              <label>Course Name</label>
-              <input value={form.courseName} onChange={e=>setForm(f=>({...f,courseName:e.target.value}))} placeholder="e.g. Remote Sensing" />
-            </div>
+          <div className="form-group">
+            <label>Title *</label>
+            <input value={form.title} onChange={e=>setForm(f=>({...f,title:e.target.value}))} placeholder="e.g. Fundamentals of Nursing Mid-Semester Exam" />
           </div>
           <div className="form-row">
             <div className="form-group">
-              <label>Date & Time * (YYYY-MM-DDTHH:MM:SSZ)</label>
-              <input value={form.date} onChange={e=>setForm(f=>({...f,date:e.target.value}))} placeholder="e.g. 2025-06-10T09:00:00Z" />
+              <label>Start Date & Time * (YYYY-MM-DDTHH:MM)</label>
+              <input type="datetime-local" value={form.startDate} onChange={e=>setForm(f=>({...f,startDate:e.target.value}))} />
             </div>
             <div className="form-group">
-              <label>Venue</label>
-              <input value={form.venue} onChange={e=>setForm(f=>({...f,venue:e.target.value}))} placeholder="e.g. Exam Hall A" />
+              <label>End Date & Time (optional)</label>
+              <input type="datetime-local" value={form.endDate} onChange={e=>setForm(f=>({...f,endDate:e.target.value}))} />
             </div>
           </div>
           <div className="form-group">
-            <label>Level</label>
-            <div className="chip-group" style={{marginTop:6}}>
-              {LEVELS.map(l=>(
-                <span key={l} className={`chip${form.level===l?' active':''}`} onClick={()=>setForm(f=>({...f,level:l}))}>
-                  {l === 'All' ? 'All Levels' : `Level ${l}`}
-                </span>
-              ))}
-            </div>
+            <label>Note (optional)</label>
+            <input value={form.note} onChange={e=>setForm(f=>({...f,note:e.target.value}))} placeholder="e.g. Bring your student ID" />
           </div>
           <button type="submit" className="btn btn-gold" disabled={saving}>
             {saving ? <span className="spinner"/> : '⏰ Add Exam'}
@@ -107,22 +94,20 @@ export default function ExamsPage() {
           : upcoming.length===0 ? <div className="empty-state"><div className="icon">⏰</div><p>No upcoming exams</p></div>
           : (
             <table>
-              <thead><tr><th>Code</th><th>Course</th><th>Date</th><th>Venue</th><th>Level</th><th>Countdown</th><th>Actions</th></tr></thead>
+              <thead><tr><th>Title</th><th>Start Date</th><th>End Date</th><th>Countdown</th><th>Actions</th></tr></thead>
               <tbody>
                 {upcoming.map(ex=>{
-                  const days = daysLeft(ex.date)
+                  const days = daysLeft(ex.startDate)
                   const col  = urgencyColor(days)
                   return (
                     <tr key={ex.id}>
-                      <td style={{fontWeight:700,color:'var(--gold3)'}}>{ex.courseCode}</td>
-                      <td style={{color:'var(--muted)',fontSize:12}}>{ex.courseName}</td>
-                      <td style={{color:'var(--gold2)',fontSize:12}}>{fmtDate(ex.date)}</td>
-                      <td style={{color:'var(--muted)',fontSize:12}}>{ex.venue || '—'}</td>
-                      <td><span className="badge badge-purple">{ex.level || 'All'}</span></td>
+                      <td style={{fontWeight:700,color:'var(--gold3)'}}>{ex.title}</td>
+                      <td style={{color:'var(--gold2)',fontSize:12}}>{fmtDate(ex.startDate)}</td>
+                      <td style={{color:'var(--muted)',fontSize:12}}>{ex.endDate ? fmtDate(ex.endDate) : '—'}</td>
                       <td style={{color:col,fontWeight:700}}>
                         {days === 0 ? 'TODAY!' : days === 1 ? '1 day' : `${days} days`}
                       </td>
-                      <td><button className="btn btn-red btn-sm" onClick={()=>handleDelete(ex.id,ex.courseCode)}>🗑️</button></td>
+                      <td><button className="btn btn-red btn-sm" onClick={()=>handleDelete(ex.id,ex.title)}>🗑️</button></td>
                     </tr>
                   )
                 })}
@@ -135,14 +120,13 @@ export default function ExamsPage() {
         <div className="card" style={{opacity:0.55}}>
           <h2 style={s.formTitle}>Past Exams ({past.length})</h2>
           <table>
-            <thead><tr><th>Code</th><th>Course</th><th>Date</th><th>Actions</th></tr></thead>
+            <thead><tr><th>Title</th><th>Start Date</th><th>Actions</th></tr></thead>
             <tbody>
               {past.map(ex=>(
                 <tr key={ex.id}>
-                  <td style={{color:'var(--dim)'}}>{ex.courseCode}</td>
-                  <td style={{color:'var(--dim)',fontSize:12}}>{ex.courseName}</td>
-                  <td style={{color:'var(--dim)',fontSize:12}}>{fmtDate(ex.date)}</td>
-                  <td><button className="btn btn-red btn-sm" onClick={()=>handleDelete(ex.id,ex.courseCode)}>🗑️</button></td>
+                  <td style={{color:'var(--dim)'}}>{ex.title}</td>
+                  <td style={{color:'var(--dim)',fontSize:12}}>{fmtDate(ex.startDate)}</td>
+                  <td><button className="btn btn-red btn-sm" onClick={()=>handleDelete(ex.id,ex.title)}>🗑️</button></td>
                 </tr>
               ))}
             </tbody>

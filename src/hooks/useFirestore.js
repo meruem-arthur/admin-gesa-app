@@ -86,11 +86,12 @@ export const addPastQuestion  = d => addDoc(collection(db, 'pastQuestions'), {
 export const deletePastQuestion = id => deleteItem('pastQuestions', id)
 
 // ─── Exams ────────────────────────────────────────────────────────────────────
-export const getExams = () => fetchCollection('exams', orderBy('date', 'asc'))
+export const getExams = () => fetchCollection('exams', orderBy('startDate', 'asc'))
 export const addExam  = d => addDoc(collection(db, 'exams'), {
-  courseCode: d.courseCode, courseName: d.courseName || '',
-  date: Timestamp.fromDate(new Date(d.date)),
-  venue: d.venue || '', level: Number(d.level) || 0,
+  title:     d.title,
+  startDate: Timestamp.fromDate(new Date(d.startDate)),
+  endDate:   d.endDate ? Timestamp.fromDate(new Date(d.endDate)) : null,
+  note:      d.note || '',
 })
 export const deleteExam = id => deleteItem('exams', id)
 
