@@ -25,10 +25,11 @@ export default function MaterialsPage() {
     setSaving(true)
     setProgress('Uploading to Cloudinary…')
     try {
-      const folder  = `gesa/materials/level${form.level}/sem${form.semester}`
-      const fileUrl = await uploadFile(file, folder)
+      const folder    = `gesa/materials/level${form.level}/sem${form.semester}`
+      const fileUrl   = await uploadFile(file, folder)
+      const fileName  = file.name
       setProgress('Saving to database…')
-      await addMaterial({ ...form, fileUrl })
+      await addMaterial({ ...form, fileUrl, fileName })
       await load(); setForm(EMPTY); setFile(null)
       setProgress('')
       show('Material uploaded!')

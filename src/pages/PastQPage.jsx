@@ -25,10 +25,11 @@ export default function PastQPage() {
     setSaving(true)
     setProgress('Uploading to Cloudinary…')
     try {
-      const folder  = `gesa/pastq/level${form.level}/sem${form.semester}`
-      const fileUrl = await uploadFile(file, folder)
+      const folder    = `gesa/pastq/level${form.level}/sem${form.semester}`
+      const fileUrl   = await uploadFile(file, folder)
+      const fileName  = file.name
       setProgress('Saving to database…')
-      await addPastQuestion({ ...form, fileUrl })
+      await addPastQuestion({ ...form, fileUrl, fileName })
       await load(); setForm(EMPTY); setFile(null)
       setProgress('')
       show('Past question uploaded!')

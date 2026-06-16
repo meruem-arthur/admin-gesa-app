@@ -72,7 +72,8 @@ export const getMaterials  = () => fetchCollection('learningMaterials', orderBy(
 export const addMaterial   = d => addDoc(collection(db, 'learningMaterials'), {
   level: Number(d.level), semester: Number(d.semester),
   courseCode: d.courseCode, courseName: d.courseName,
-  fileUrl: d.fileUrl, uploadedAt: Timestamp.now(),
+  fileUrl: d.fileUrl, fileName: d.fileName || '',
+  uploadedAt: Timestamp.now(),
 })
 export const deleteMaterial = id => deleteItem('learningMaterials', id)
 
@@ -81,7 +82,8 @@ export const getPastQuestions = () => fetchCollection('pastQuestions', orderBy('
 export const addPastQuestion  = d => addDoc(collection(db, 'pastQuestions'), {
   level: Number(d.level), semester: Number(d.semester),
   courseCode: d.courseCode, courseName: d.courseName,
-  year: Number(d.year), fileUrl: d.fileUrl, uploadedAt: Timestamp.now(),
+  year: Number(d.year), fileUrl: d.fileUrl,
+  fileName: d.fileName || '', uploadedAt: Timestamp.now(),
 })
 export const deletePastQuestion = id => deleteItem('pastQuestions', id)
 
