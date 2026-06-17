@@ -48,6 +48,7 @@ export const addEvent  = d => addDoc(collection(db, 'events'), {
   date: Timestamp.fromDate(new Date(d.date)),
   location: d.location || '', tag: d.tag || 'General',
   featured: d.featured || false,
+  imageUrl: d.imageUrl || '',
 })
 export const deleteEvent = id => deleteItem('events', id)
 
