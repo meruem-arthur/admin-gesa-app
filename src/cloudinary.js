@@ -1,13 +1,25 @@
-const CLOUD_NAME   = 'df9ns044o'
+const CLOUD_NAME    = 'df9ns044o'
 const UPLOAD_PRESET = 'gesa-app'
 
+const DOCUMENT_TYPES = [
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/vnd.ms-powerpoint',
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+]
+
 export async function uploadFile(file, folder = 'gesa') {
-  const isPDF = file.type === 'application/pdf'
-  const resType = isPDF ? 'raw' : 'image'
+  // Use MIME type to determine resource type — docx/pptx must go via 'raw'
+  const isDocument = DOCUMENT_TYPES.includes(file.type)
+    || /\.(pdf|docx|doc|pptx|ppt)$/i.test(file.name)
+  const resType = isDocument ? 'raw' : 'image'
+
   const formData = new FormData()
   formData.append('file', file)
   formData.append('upload_preset', UPLOAD_PRESET)
   formData.append('folder', folder)
+
   const res = await fetch(
     `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/${resType}/upload`,
     { method: 'POST', body: formData }
