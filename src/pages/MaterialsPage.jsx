@@ -21,7 +21,7 @@ export default function MaterialsPage() {
 
   async function handleSubmit(e) {
     e.preventDefault()
-    if (!form.courseCode || !file) return show('Fill course code and pick a PDF', 'error')
+    if (!form.courseCode || !file) return show('Fill course code and pick a file', 'error')
     setSaving(true)
     setProgress('Uploading to Cloudinary…')
     try {
@@ -85,9 +85,9 @@ export default function MaterialsPage() {
             </div>
           </div>
           <div className="form-group">
-            <label>PDF File *</label>
+            <label>File * <span style={{color:'var(--muted)',fontWeight:400}}>(PDF, Word, PowerPoint)</span></label>
             <input
-              type="file" accept="application/pdf"
+              type="file" accept=".pdf,.docx,.pptx,.doc,.ppt"
               onChange={e=>setFile(e.target.files[0])}
               style={{padding:'8px 12px'}}
             />
@@ -115,7 +115,7 @@ export default function MaterialsPage() {
                     <td><span className="badge badge-purple">Sem {m.semester}</span></td>
                     <td>
                       <a href={m.fileUrl} target="_blank" rel="noreferrer" style={{color:'var(--blue)',fontSize:12}}>
-                        📄 View PDF
+                        📄 {m.fileName ? m.fileName.split('.').pop().toUpperCase() : 'View'}
                       </a>
                     </td>
                     <td>

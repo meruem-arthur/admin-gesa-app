@@ -21,7 +21,7 @@ export default function PastQPage() {
 
   async function handleSubmit(e) {
     e.preventDefault()
-    if (!form.courseCode || !form.year || !file) return show('Fill all fields and pick a PDF', 'error')
+    if (!form.courseCode || !form.year || !file) return show('Fill all fields and pick a file', 'error')
     setSaving(true)
     setProgress('Uploading to Cloudinary…')
     try {
@@ -89,8 +89,8 @@ export default function PastQPage() {
             </div>
           </div>
           <div className="form-group">
-            <label>PDF File *</label>
-            <input type="file" accept="application/pdf" onChange={e=>setFile(e.target.files[0])} style={{padding:'8px 12px'}} />
+            <label>File * <span style={{color:'var(--muted)',fontWeight:400}}>(PDF, Word, PowerPoint)</span></label>
+            <input type="file" accept=".pdf,.docx,.pptx,.doc,.ppt" onChange={e=>setFile(e.target.files[0])} style={{padding:'8px 12px'}} />
             {file && <p style={{fontSize:12,color:'var(--gold2)',marginTop:4}}>📄 {file.name} ({(file.size/1024/1024).toFixed(2)} MB)</p>}
           </div>
           {progress && <p style={{fontSize:12,color:'var(--muted)',marginBottom:10}}>⏳ {progress}</p>}
