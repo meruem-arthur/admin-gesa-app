@@ -35,7 +35,8 @@ export const getLecturers = () => fetchCollection('lecturers')
 export const addLecturer  = d => addDoc(collection(db, 'lecturers'), {
   name: d.name, title: d.title || 'Lecturer', major: d.major || '',
   phone: d.phone || '', email: d.email || '',
-  isPinned: d.isPinned || false, photoUrl: d.photoUrl || '',
+  pinnedRole: d.pinnedRole || '', // '' | 'HOD' | 'Dean'
+  photoUrl: d.photoUrl || '',
 })
 export const updateLecturer = (id, d) => updateItem('lecturers', id, d)
 export const deleteLecturer = id => deleteItem('lecturers', id)

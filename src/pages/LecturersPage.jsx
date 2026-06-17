@@ -3,7 +3,14 @@ import { getLecturers, addLecturer, updateLecturer, deleteLecturer } from '../ho
 import { uploadPhoto } from '../cloudinary'
 import { useToast } from '../hooks/useToast'
 
-const EMPTY = { name: '', title: '', major: '', phone: '', email: '', isPinned: false, photoUrl: '' }
+// pinnedRole: '' | 'HOD' | 'Dean'
+const EMPTY = { name: '', title: '', major: '', phone: '', email: '', pinnedRole: '', photoUrl: '' }
+
+const PIN_OPTIONS = [
+  { value: '',     label: 'None' },
+  { value: 'HOD',  label: 'HOD'  },
+  { value: 'Dean', label: 'Dean' },
+]
 
 export default function LecturersPage() {
   const [list, setList]           = useState([])
@@ -14,12 +21,32 @@ export default function LecturersPage() {
   const [saving, setSaving]       = useState(false)
   const { show, Toast }           = useToast()
 
-  const load = async () => { setLoading(true); const d = await getLecturers(); d.sort((a,b)=>{if(a.isPinned&&!b.isPinned)return -1;if(!a.isPinned&&b.isPinned)return 1;return a.name.localeCompare(b.name)}); setList(d); setLoading(false) }
+  const load = async () => {
+    setLoading(true)
+    const d = await getLecturers()
+    d.sort((a, b) => {
+      const aPinned = !!a.pinnedRole
+      const bPinned = !!b.pinnedRole
+      if (aPinned && !bPinned) return -1
+      if (!aPinned && bPinned) return 1
+      return a.name.localeCompare(b.name)
+    })
+    setList(d)
+    setLoading(false)
+  }
   useEffect(() => { load() }, [])
 
   function startEdit(lec) {
     setEditId(lec.id)
-    setForm({ name: lec.name, title: lec.title||'', major: lec.major||'', phone: lec.phone||'', email: lec.email||'', isPinned: lec.isPinned||false, photoUrl: lec.photoUrl||'' })
+    setForm({
+      name: lec.name,
+      title: lec.title || '',
+      major: lec.major || '',
+      phone: lec.phone || '',
+      email: lec.email || '',
+      pinnedRole: lec.pinnedRole || '',
+      photoUrl: lec.photoUrl || '',
+    })
     setPhotoFile(null)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
@@ -70,10 +97,23 @@ export default function LecturersPage() {
               {form.photoUrl && !photoFile && <img src={form.photoUrl} alt="" style={s.thumb} />}
             </div>
           </div>
-          <div className="form-group" style={{ display:'flex', alignItems:'center', gap:10 }}>
-            <input type="checkbox" id="pinned" checked={form.isPinned} onChange={e=>setForm(f=>({...f,isPinned:e.target.checked}))} style={{ width:'auto' }} />
-            <label htmlFor="pinned" style={{ margin:0, textTransform:'none', fontSize:13, color:'var(--muted)' }}>Pin as HOD / Dean (shows at top)</label>
+
+          {/* Pin role — None / HOD / Dean (mutually exclusive) */}
+          <div className="form-group">
+            <label>Pin as (shows at top of list)</label>
+            <div className="chip-group" style={{ marginTop: 6 }}>
+              {PIN_OPTIONS.map(opt => (
+                <span
+                  key={opt.value}
+                  className={`chip${form.pinnedRole === opt.value ? ' active' : ''}`}
+                  onClick={() => setForm(f => ({ ...f, pinnedRole: opt.value }))}
+                >
+                  {opt.label}
+                </span>
+              ))}
+            </div>
           </div>
+
           <div style={{ display:'flex', gap:10, marginTop:4 }}>
             <button type="submit" className="btn btn-gold" disabled={saving}>{saving ? <span className="spinner"/> : editId ? 'Update' : 'Save Lecturer'}</button>
             {editId && <button type="button" className="btn btn-ghost" onClick={reset}>Cancel</button>}
@@ -96,7 +136,12 @@ export default function LecturersPage() {
                     <td style={{color:'var(--muted)'}}>{lec.title}</td>
                     <td style={{color:'var(--muted)', fontSize:12}}>{lec.major}</td>
                     <td style={{color:'var(--gold2)', fontSize:12}}>{lec.phone}</td>
-                    <td>{lec.isPinned ? <span className="badge badge-gold">HOD/Dean</span> : <span className="badge badge-purple">Lecturer</span>}</td>
+                    <td>
+                      {lec.pinnedRole === 'HOD'  ? <span className="badge badge-gold">HOD</span>
+                        : lec.pinnedRole === 'Dean' ? <span className="badge badge-gold">Dean</span>
+                        : <span className="badge badge-purple">Lecturer</span>
+                      }
+                    </td>
                     <td>
                       <div style={{display:'flex',gap:8}}>
                         <button className="btn btn-ghost btn-sm" onClick={()=>startEdit(lec)}>✏️ Edit</button>
