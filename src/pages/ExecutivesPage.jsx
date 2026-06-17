@@ -3,7 +3,7 @@ import { getExecutives, addExecutive, updateExecutive, deleteExecutive } from '.
 import { uploadPhoto } from '../cloudinary'
 import { useToast } from '../hooks/useToast'
 
-const EMPTY = { name: '', position: '', order: '', bio: '', photoUrl: '' }
+const EMPTY = { name: '', position: '', order: '', phone: '', bio: '', photoUrl: '' }
 
 export default function ExecutivesPage() {
   const [list, setList]           = useState([])
@@ -19,7 +19,14 @@ export default function ExecutivesPage() {
 
   function startEdit(ex) {
     setEditId(ex.id)
-    setForm({ name: ex.name, position: ex.position, order: String(ex.order || ''), bio: ex.bio || '', photoUrl: ex.photoUrl || '' })
+    setForm({
+      name: ex.name,
+      position: ex.position,
+      order: String(ex.order || ''),
+      phone: ex.phone || '',
+      bio: ex.bio || '',
+      photoUrl: ex.photoUrl || '',
+    })
     setPhotoFile(null)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
@@ -62,13 +69,16 @@ export default function ExecutivesPage() {
           </div>
           <div className="form-row">
             <div className="form-group"><label>Order (1 = President)</label><input type="number" value={form.order} onChange={e => setForm(f => ({ ...f, order: e.target.value }))} placeholder="1" /></div>
+            <div className="form-group"><label>Phone</label><input value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} placeholder="+233 24 000 0001" /></div>
+          </div>
+          <div className="form-row">
             <div className="form-group">
               <label>Photo</label>
               <input type="file" accept="image/*" onChange={e => setPhotoFile(e.target.files[0])} style={{ padding: '8px 12px' }} />
               {form.photoUrl && !photoFile && <img src={form.photoUrl} alt="" style={s.photoThumb} />}
             </div>
+            <div className="form-group"><label>Bio (optional)</label><textarea value={form.bio} onChange={e => setForm(f => ({ ...f, bio: e.target.value }))} placeholder="Short bio…" style={{ minHeight: 40 }} /></div>
           </div>
-          <div className="form-group"><label>Bio (optional)</label><textarea value={form.bio} onChange={e => setForm(f => ({ ...f, bio: e.target.value }))} placeholder="Short bio…" /></div>
           <div style={{ display: 'flex', gap: 10 }}>
             <button type="submit" className="btn btn-gold" disabled={saving}>{saving ? <span className="spinner" /> : editId ? 'Update' : 'Save Executive'}</button>
             {editId && <button type="button" className="btn btn-ghost" onClick={reset}>Cancel</button>}
@@ -83,7 +93,7 @@ export default function ExecutivesPage() {
           : list.length === 0 ? <div className="empty-state"><div className="icon">👥</div><p>No executives yet</p></div>
           : (
             <table>
-              <thead><tr><th>#</th><th>Photo</th><th>Name</th><th>Position</th><th>Actions</th></tr></thead>
+              <thead><tr><th>#</th><th>Photo</th><th>Name</th><th>Position</th><th>Phone</th><th>Actions</th></tr></thead>
               <tbody>
                 {list.map((ex, i) => (
                   <tr key={ex.id}>
@@ -95,6 +105,7 @@ export default function ExecutivesPage() {
                     </td>
                     <td style={{ fontWeight: 600 }}>{ex.name}</td>
                     <td><span className="badge badge-gold">{ex.position}</span></td>
+                    <td style={{ color: 'var(--gold2)', fontSize: 12 }}>{ex.phone || '—'}</td>
                     <td>
                       <div style={{ display: 'flex', gap: 8 }}>
                         <button className="btn btn-ghost btn-sm" onClick={() => startEdit(ex)}>✏️ Edit</button>

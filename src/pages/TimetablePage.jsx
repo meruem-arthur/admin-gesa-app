@@ -158,6 +158,7 @@ async function parseTimetableExcel(file, courseMap, semesterNum) {
           level,
           lecturer,
           semester: semesterNum,
+          sortOrder: colIdx, // chronological position (2-16) for correct day-order sorting
           uploadedAt: Timestamp.now(),
         })
       }

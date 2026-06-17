@@ -25,7 +25,7 @@ export async function updateItem(col, id, data) {
 export const getExecutives = () => fetchCollection('executives', orderBy('order', 'asc'))
 export const addExecutive  = d => addDoc(collection(db, 'executives'), {
   name: d.name, position: d.position, order: Number(d.order) || 99,
-  photoUrl: d.photoUrl || '', bio: d.bio || '',
+  photoUrl: d.photoUrl || '', phone: d.phone || '', bio: d.bio || '',
 })
 export const updateExecutive = (id, d) => updateItem('executives', id, d)
 export const deleteExecutive = id => deleteItem('executives', id)
@@ -48,7 +48,6 @@ export const addEvent  = d => addDoc(collection(db, 'events'), {
   date: Timestamp.fromDate(new Date(d.date)),
   location: d.location || '', tag: d.tag || 'General',
   featured: d.featured || false,
-  imageUrl: d.imageUrl || '',
 })
 export const deleteEvent = id => deleteItem('events', id)
 
@@ -98,6 +97,13 @@ export const addExam  = d => addDoc(collection(db, 'exams'), {
   note:      d.note || '',
 })
 export const deleteExam = id => deleteItem('exams', id)
+
+// ─── Reports (student → admin) ─────────────────────────────────────────────────
+export const getReports    = () => fetchCollection('reports', orderBy('createdAt', 'desc'))
+export const updateReport  = (id, d) => updateItem('reports', id, d)
+export const deleteReport  = id => deleteItem('reports', id)
+export const resolveReport = id => updateItem('reports', id, { status: 'resolved' })
+export const reopenReport  = id => updateItem('reports', id, { status: 'open' })
 
 // ─── Push tokens ──────────────────────────────────────────────────────────────
 export async function getAllPushTokens() {

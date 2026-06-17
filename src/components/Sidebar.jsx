@@ -14,6 +14,7 @@ const NAV = [
   { to: '/timetable',     icon: '🗓️', label: 'Timetable'      },
   { to: '/notifications', icon: '🔔', label: 'Notifications'  },
   { to: '/forum',         icon: '💬', label: 'Forum'          },
+  { to: '/reports',       icon: '🚩', label: 'Reports'        },
 ]
 
 const LOGO_URL = 'https://res.cloudinary.com/df9ns044o/image/upload/v1779677619/gesa-logo_am7hpu.jpg'
