@@ -13,8 +13,9 @@ import MaterialsPage     from './pages/MaterialsPage'
 import PastQPage         from './pages/PastQPage'
 import ExamsPage         from './pages/ExamsPage'
 import NotificationsPage from './pages/NotificationsPage'
-import ForumPage         from './pages/ForumPage'
-import TimetablePage     from './pages/TimetablePage'
+import ForumPage        from './pages/ForumPage'
+import TimetablePage    from './pages/TimetablePage'
+import ReportsPage      from './pages/ReportsPage'
 
 export default function App() {
   const [authed, setAuthed] = useState(() => sessionStorage.getItem('gesa_admin') === '1')
@@ -24,7 +25,11 @@ export default function App() {
 
   return (
     <div style={{ position: 'relative', minHeight: '100vh' }}>
+
+      {/* Wave — fixed behind everything */}
       <WaveBackground />
+
+      {/* App content */}
       <div style={{ position: 'relative', zIndex: 1, display: 'flex', minHeight: '100vh' }}>
         {!authed
           ? <LoginPage onLogin={handleLogin} />
@@ -36,8 +41,9 @@ export default function App() {
                 padding: '24px',
                 overflowY: 'auto',
                 background: 'transparent',
+                // On mobile leave space for the hamburger button
                 paddingTop: window.innerWidth < 768 ? '72px' : '32px',
-                minWidth: 0,
+                minWidth: 0, // prevents overflow
               }}>
                 <Routes>
                   <Route path="/"              element={<Dashboard />} />
@@ -49,9 +55,10 @@ export default function App() {
                   <Route path="/materials"     element={<MaterialsPage />} />
                   <Route path="/pastquestions" element={<PastQPage />} />
                   <Route path="/exams"         element={<ExamsPage />} />
-                  <Route path="/timetable"     element={<TimetablePage />} />
                   <Route path="/notifications" element={<NotificationsPage />} />
                   <Route path="/forum"         element={<ForumPage />} />
+                  <Route path="/timetable"     element={<TimetablePage />} />
+                  <Route path="/reports"       element={<ReportsPage />} />
                   <Route path="*"              element={<Navigate to="/" />} />
                 </Routes>
               </main>
