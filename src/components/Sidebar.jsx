@@ -12,6 +12,7 @@ const NAV = [
   { to: '/pastquestions', icon: '📄', label: 'Past Questions' },
   { to: '/exams',         icon: '⏰', label: 'Exams'          },
   { to: '/timetable',     icon: '🗓️', label: 'Timetable'      },
+  { to: '/software',      icon: '💾', label: 'Software'        },
   { to: '/notifications', icon: '🔔', label: 'Notifications'  },
   { to: '/forum',         icon: '💬', label: 'Forum'          },
   { to: '/reports',       icon: '🚩', label: 'Reports'        },

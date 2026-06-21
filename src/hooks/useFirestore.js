@@ -98,6 +98,16 @@ export const addExam  = d => addDoc(collection(db, 'exams'), {
 })
 export const deleteExam = id => deleteItem('exams', id)
 
+// ─── Software ─────────────────────────────────────────────────────────────────
+export const getSoftware   = () => fetchCollection('software', orderBy('createdAt', 'desc'))
+export const addSoftware   = d => addDoc(collection(db, 'software'), {
+  name: d.name, category: d.category || '',
+  imageUrl: d.imageUrl || '', downloadUrl: d.downloadUrl || '',
+  description: d.description || '', fileSize: d.fileSize || '',
+  createdAt: Timestamp.now(),
+})
+export const deleteSoftware = id => deleteItem('software', id)
+
 // ─── Reports (student → admin) ─────────────────────────────────────────────────
 export const getReports    = () => fetchCollection('reports', orderBy('createdAt', 'desc'))
 export const updateReport  = (id, d) => updateItem('reports', id, d)
