@@ -3,7 +3,7 @@ import { getSoftware, addSoftware, deleteSoftware } from '../hooks/useFirestore'
 import { uploadPhoto } from '../cloudinary'
 import { useToast } from '../hooks/useToast'
 
-const EMPTY = { name: '', category: '', downloadUrl: '', description: '', fileSize: '' }
+const EMPTY = { name: '', category: '', downloadUrl: '', description: '', fileSize: '', installVideoUrl: '' }
 
 export default function SoftwarePage() {
   const [list, setList]           = useState([])
@@ -123,6 +123,11 @@ export default function SoftwarePage() {
             <label>Description <span style={{color:'var(--muted)',fontWeight:400}}>(optional)</span></label>
             <textarea value={form.description} onChange={e=>setForm(f=>({...f,description:e.target.value}))} placeholder="Brief description of what the software does…" rows={2} />
           </div>
+          <div className="form-group">
+            <label>Installation Guide (YouTube) <span style={{color:'var(--muted)',fontWeight:400}}>(optional)</span></label>
+            <input value={form.installVideoUrl} onChange={e=>setForm(f=>({...f,installVideoUrl:e.target.value}))} placeholder="https://youtube.com/…" />
+            <small style={{color:'var(--dim)',fontSize:11}}>Shown as a "Watch Install Guide" button in the app</small>
+          </div>
           {progress && <p style={{fontSize:12,color:'var(--muted)',marginBottom:10}}>⏳ {progress}</p>}
           <button type="submit" className="btn btn-gold" disabled={saving}>
             {saving ? <span className="spinner"/> : '💾 Add Software'}
@@ -157,6 +162,14 @@ export default function SoftwarePage() {
                         <a href={sw.downloadUrl} target="_blank" rel="noreferrer" style={{color:'var(--blue)',fontSize:12}}>
                           🔗 Link
                         </a>
+                        {sw.installVideoUrl && (
+                          <>
+                            {' · '}
+                            <a href={sw.installVideoUrl} target="_blank" rel="noreferrer" style={{color:'#c084fc',fontSize:12}}>
+                              ▶ Guide
+                            </a>
+                          </>
+                        )}
                       </td>
                       <td><button className="btn btn-red btn-sm" onClick={()=>handleDelete(sw.id,sw.name)}>🗑️ Delete</button></td>
                     </tr>

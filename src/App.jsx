@@ -17,6 +17,7 @@ import ForumPage        from './pages/ForumPage'
 import TimetablePage    from './pages/TimetablePage'
 import ReportsPage      from './pages/ReportsPage'
 import SoftwarePage     from './pages/SoftwarePage'
+import TutorialsPage    from './pages/TutorialsPage'
 
 export default function App() {
   const [authed, setAuthed] = useState(() => sessionStorage.getItem('gesa_admin') === '1')
@@ -61,6 +62,7 @@ export default function App() {
                   <Route path="/timetable"     element={<TimetablePage />} />
                   <Route path="/reports"       element={<ReportsPage />} />
                   <Route path="/software"      element={<SoftwarePage />} />
+                  <Route path="/tutorials"     element={<TutorialsPage />} />
                   <Route path="*"              element={<Navigate to="/" />} />
                 </Routes>
               </main>

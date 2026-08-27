@@ -104,9 +104,20 @@ export const addSoftware   = d => addDoc(collection(db, 'software'), {
   name: d.name, category: d.category || '',
   imageUrl: d.imageUrl || '', downloadUrl: d.downloadUrl || '',
   description: d.description || '', fileSize: d.fileSize || '',
+  installVideoUrl: d.installVideoUrl || '',
   createdAt: Timestamp.now(),
 })
 export const deleteSoftware = id => deleteItem('software', id)
+
+// ─── Tutorials ────────────────────────────────────────────────────────────────
+export const getTutorials  = () => fetchCollection('tutorials', orderBy('createdAt', 'desc'))
+export const addTutorial   = d => addDoc(collection(db, 'tutorials'), {
+  title: d.title, software: d.software || '',
+  youtubeUrl: d.youtubeUrl || '', thumbnailUrl: d.thumbnailUrl || '',
+  description: d.description || '',
+  createdAt: Timestamp.now(),
+})
+export const deleteTutorial = id => deleteItem('tutorials', id)
 
 // ─── Reports (student → admin) ─────────────────────────────────────────────────
 export const getReports    = () => fetchCollection('reports', orderBy('createdAt', 'desc'))
