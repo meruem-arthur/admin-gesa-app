@@ -1,24 +1,43 @@
 import React, { useState } from 'react'
-
-const ADMIN_PASSWORD = 'Bond442@love1'
+import { signInWithEmailAndPassword } from 'firebase/auth'
+import { auth } from '../firebase'
 
 // ── GESA logo from Cloudinary — no local file needed ──
-// Replace with your actual Cloudinary URL after uploading the logo once
 const LOGO_URL = 'https://res.cloudinary.com/df9ns044o/image/upload/v1779677619/gesa-logo_am7hpu.jpg'
 
-export default function LoginPage({ onLogin }) {
+export default function LoginPage() {
+  const [email, setEmail]     = useState('')
   const [pwd, setPwd]         = useState('')
   const [err, setErr]         = useState('')
   const [loading, setLoading] = useState(false)
   const [imgError, setImgError] = useState(false)
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault()
+    setErr('')
     setLoading(true)
-    setTimeout(() => {
-      if (pwd === ADMIN_PASSWORD) { onLogin() }
-      else { setErr('Incorrect password.'); setLoading(false) }
-    }, 600)
+    try {
+      // Signing in is all this does — App.jsx watches auth state and checks
+      // the /admins collection before granting access to the dashboard.
+      await signInWithEmailAndPassword(auth, email.trim(), pwd)
+    } catch (error) {
+      switch (error.code) {
+        case 'auth/invalid-email':
+          setErr('That email address looks invalid.')
+          break
+        case 'auth/user-not-found':
+        case 'auth/wrong-password':
+        case 'auth/invalid-credential':
+          setErr('Incorrect email or password.')
+          break
+        case 'auth/too-many-requests':
+          setErr('Too many attempts. Try again in a few minutes.')
+          break
+        default:
+          setErr('Something went wrong. Please try again.')
+      }
+      setLoading(false)
+    }
   }
 
   return (
@@ -35,7 +54,6 @@ export default function LoginPage({ onLogin }) {
               onError={() => setImgError(true)}
             />
           ) : (
-            // Fallback if image not uploaded yet
             <div style={s.logoFallback}>
               GE<span style={{ color: '#e8b82a' }}>SA</span>
             </div>
@@ -47,13 +65,24 @@ export default function LoginPage({ onLogin }) {
 
         <form onSubmit={handleSubmit} style={{ marginTop: 28, width: '100%' }}>
           <div className="form-group">
-            <label>Admin Password</label>
+            <label>Admin Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={e => { setEmail(e.target.value); setErr('') }}
+              placeholder="you@example.com"
+              autoFocus
+              autoComplete="username"
+            />
+          </div>
+          <div className="form-group" style={{ marginTop: 14 }}>
+            <label>Password</label>
             <input
               type="password"
               value={pwd}
               onChange={e => { setPwd(e.target.value); setErr('') }}
               placeholder="Enter password"
-              autoFocus
+              autoComplete="current-password"
             />
             {err && <p style={s.err}>{err}</p>}
           </div>
