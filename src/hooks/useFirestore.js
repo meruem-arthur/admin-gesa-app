@@ -107,6 +107,7 @@ export const addSoftware   = d => addDoc(collection(db, 'software'), {
   installVideoUrl: d.installVideoUrl || '',
   createdAt: Timestamp.now(),
 })
+export const updateSoftware = (id, d) => updateItem('software', id, d)
 export const deleteSoftware = id => deleteItem('software', id)
 
 // ─── Tutorials ────────────────────────────────────────────────────────────────
