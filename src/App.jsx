@@ -21,6 +21,10 @@ import TimetablePage    from './pages/TimetablePage'
 import ReportsPage      from './pages/ReportsPage'
 import SoftwarePage     from './pages/SoftwarePage'
 import TutorialsPage    from './pages/TutorialsPage'
+import HeroSlidesPage   from './pages/HeroSlidesPage'
+import SiteGalleryPage  from './pages/SiteGalleryPage'
+import SiteContentPage  from './pages/SiteContentPage'
+import SiteLinksPage    from './pages/SiteLinksPage'
 
 export default function App() {
   const [user, setUser]       = useState(null)
@@ -115,6 +119,10 @@ export default function App() {
                   <Route path="/reports"       element={<ReportsPage />} />
                   <Route path="/software"      element={<SoftwarePage />} />
                   <Route path="/tutorials"     element={<TutorialsPage />} />
+                  <Route path="/hero-slides"   element={<HeroSlidesPage />} />
+                  <Route path="/site-gallery"  element={<SiteGalleryPage />} />
+                  <Route path="/site-content"  element={<SiteContentPage />} />
+                  <Route path="/site-links"    element={<SiteLinksPage />} />
                   <Route path="*"              element={<Navigate to="/" />} />
                 </Routes>
               </main>

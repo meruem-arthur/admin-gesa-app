@@ -4,7 +4,7 @@ import { uploadPhoto } from '../cloudinary'
 import { useToast } from '../hooks/useToast'
 
 // pinnedRole: '' | 'HOD' | 'Dean'
-const EMPTY = { name: '', title: '', major: '', phone: '', email: '', pinnedRole: '', photoUrl: '' }
+const EMPTY = { name: '', title: '', major: '', phone: '', email: '', pinnedRole: '', photoUrl: '', hodMessage: '' }
 
 const PIN_OPTIONS = [
   { value: '',     label: 'None' },
@@ -46,6 +46,7 @@ export default function LecturersPage() {
       email: lec.email || '',
       pinnedRole: lec.pinnedRole || '',
       photoUrl: lec.photoUrl || '',
+      hodMessage: lec.hodMessage || '',
     })
     setPhotoFile(null)
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -113,6 +114,18 @@ export default function LecturersPage() {
               ))}
             </div>
           </div>
+
+          {form.pinnedRole === 'HOD' && (
+            <div className="form-group">
+              <label>Welcome message (shown on the public site homepage)</label>
+              <textarea
+                value={form.hodMessage}
+                onChange={e => setForm(f => ({ ...f, hodMessage: e.target.value }))}
+                placeholder="Welcome to the Geomatic Engineering Department…"
+                style={{ minHeight: 80 }}
+              />
+            </div>
+          )}
 
           <div style={{ display:'flex', gap:10, marginTop:4 }}>
             <button type="submit" className="btn btn-gold" disabled={saving}>{saving ? <span className="spinner"/> : editId ? 'Update' : 'Save Lecturer'}</button>

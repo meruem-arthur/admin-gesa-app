@@ -37,6 +37,7 @@ export const addLecturer  = d => addDoc(collection(db, 'lecturers'), {
   phone: d.phone || '', email: d.email || '',
   pinnedRole: d.pinnedRole || '', // '' | 'HOD' | 'Dean'
   photoUrl: d.photoUrl || '',
+  hodMessage: d.hodMessage || '',
 })
 export const updateLecturer = (id, d) => updateItem('lecturers', id, d)
 export const deleteLecturer = id => deleteItem('lecturers', id)
@@ -126,6 +127,37 @@ export const updateReport  = (id, d) => updateItem('reports', id, d)
 export const deleteReport  = id => deleteItem('reports', id)
 export const resolveReport = id => updateItem('reports', id, { status: 'resolved' })
 export const reopenReport  = id => updateItem('reports', id, { status: 'open' })
+
+// ─── Hero Slides (public site homepage carousel) ──────────────────────────────
+export const getHeroSlides   = () => fetchCollection('heroSlides', orderBy('order', 'asc'))
+export const addHeroSlide    = d => addDoc(collection(db, 'heroSlides'), {
+  imageUrl: d.imageUrl, caption: d.caption || '', order: Number(d.order) || 99,
+})
+export const updateHeroSlide = (id, d) => updateItem('heroSlides', id, d)
+export const deleteHeroSlide = id => deleteItem('heroSlides', id)
+
+// ─── Gallery Photos (public site) ──────────────────────────────────────────────
+export const getGalleryPhotos = () => fetchCollection('galleryPhotos', orderBy('createdAt', 'desc'))
+export const addGalleryPhoto  = d => addDoc(collection(db, 'galleryPhotos'), {
+  imageUrl: d.imageUrl, caption: d.caption || '', createdAt: Timestamp.now(),
+})
+export const deleteGalleryPhoto = id => deleteItem('galleryPhotos', id)
+
+// ─── Site Content (single doc: About text, tagline, contact info) ─────────────
+export async function getSiteContent() {
+  const snap = await getDocs(query(collection(db, 'siteContent')))
+  const d = snap.docs.find(x => x.id === 'home')
+  return d ? d.data() : {}
+}
+export const updateSiteContent = data => setDoc(doc(db, 'siteContent', 'home'), data, { merge: true })
+
+// ─── Site Links (single doc: Dues / Election / Portal / VLE / Internship) ─────
+export async function getSiteLinks() {
+  const snap = await getDocs(query(collection(db, 'siteLinks')))
+  const d = snap.docs.find(x => x.id === 'links')
+  return d ? d.data() : {}
+}
+export const updateSiteLinks = data => setDoc(doc(db, 'siteLinks', 'links'), data, { merge: true })
 
 // ─── Push tokens ──────────────────────────────────────────────────────────────
 export async function getAllPushTokens() {
