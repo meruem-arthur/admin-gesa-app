@@ -151,13 +151,13 @@ export async function getSiteContent() {
 }
 export const updateSiteContent = data => setDoc(doc(db, 'siteContent', 'home'), data, { merge: true })
 
-// ─── Site Links (single doc: Dues / Election / Portal / VLE / Internship) ─────
-export async function getSiteLinks() {
-  const snap = await getDocs(query(collection(db, 'siteLinks')))
-  const d = snap.docs.find(x => x.id === 'links')
-  return d ? d.data() : {}
-}
-export const updateSiteLinks = data => setDoc(doc(db, 'siteLinks', 'links'), data, { merge: true })
+// ─── Site Links (open-ended list — Dues, Election, program pages, anything) ───
+export const getSiteLinks   = () => fetchCollection('siteLinks', orderBy('order', 'asc'))
+export const addSiteLink    = d => addDoc(collection(db, 'siteLinks'), {
+  label: d.label, url: d.url, order: Number(d.order) || 99,
+})
+export const updateSiteLink = (id, d) => updateItem('siteLinks', id, d)
+export const deleteSiteLink = id => deleteItem('siteLinks', id)
 
 // ─── Push tokens ──────────────────────────────────────────────────────────────
 export async function getAllPushTokens() {
