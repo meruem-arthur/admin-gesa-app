@@ -1,14 +1,28 @@
 import React, { useEffect, useState } from 'react'
 import { getSiteContent, updateSiteContent } from '../hooks/useFirestore'
+import { uploadPhoto } from '../cloudinary'
 import { useToast } from '../hooks/useToast'
 
-const EMPTY = { tagline: 'The Eye of the Engineer', campus: 'Essikado', aboutText: '', contactEmail: '', contactPhone: '' }
+const EMPTY = {
+  tagline: 'The Eye of the Engineer', campus: 'Essikado', aboutText: '',
+  contactEmail: '', contactPhone: '',
+  sidebarImageUrl: '', aboutHeroImageUrl: '', aboutSecondImageUrl: '', contactHeroImageUrl: '',
+}
+
+// Each entry: the siteContent field it writes, the Cloudinary folder, and its label/hint
+const IMAGE_FIELDS = [
+  { key: 'sidebarImageUrl',      folder: 'gesa/site/sidebar', label: 'Sidebar background image',   hint: 'Shown behind the mobile navigation menu on the public site.' },
+  { key: 'aboutHeroImageUrl',    folder: 'gesa/site/about',   label: 'About page — hero image',     hint: 'Top banner image on the About page.' },
+  { key: 'aboutSecondImageUrl',  folder: 'gesa/site/about',   label: 'About page — secondary image', hint: 'Image shown alongside the "Who Are We" / departments section.' },
+  { key: 'contactHeroImageUrl',  folder: 'gesa/site/contact', label: 'Contact page — hero image',   hint: 'Top banner image on the Contact page.' },
+]
 
 export default function SiteContentPage() {
-  const [form, setForm]       = useState(EMPTY)
-  const [loading, setLoading] = useState(true)
-  const [saving, setSaving]   = useState(false)
-  const { show, Toast }       = useToast()
+  const [form, setForm]           = useState(EMPTY)
+  const [loading, setLoading]     = useState(true)
+  const [saving, setSaving]       = useState(false)
+  const [uploadingKey, setUploadingKey] = useState(null)
+  const { show, Toast }           = useToast()
 
   useEffect(() => {
     getSiteContent().then(d => { setForm({ ...EMPTY, ...d }); setLoading(false) })
@@ -24,15 +38,36 @@ export default function SiteContentPage() {
     finally { setSaving(false) }
   }
 
+  // Image pickers save immediately on upload, so admins don't lose a
+  // successful upload if they forget to hit "Save Changes" afterwards.
+  async function handlePickImage(key, folder, file) {
+    if (!file) return
+    setUploadingKey(key)
+    try {
+      const imageUrl = await uploadPhoto(file, folder)
+      setForm(f => ({ ...f, [key]: imageUrl }))
+      await updateSiteContent({ [key]: imageUrl })
+      show('Image updated!')
+    } catch (err) { show(err.message, 'error') }
+    finally { setUploadingKey(null) }
+  }
+
+  async function handleRemoveImage(key) {
+    if (!confirm('Remove this image?')) return
+    setForm(f => ({ ...f, [key]: '' }))
+    try { await updateSiteContent({ [key]: '' }); show('Image removed.') }
+    catch (err) { show(err.message, 'error') }
+  }
+
   if (loading) return <div style={{ textAlign: 'center', padding: 32 }}><span className="spinner" /></div>
 
   return (
     <div>
       {Toast}
       <h1 style={s.title}>Site Content</h1>
-      <p style={s.hint}>Text shown on the public website's homepage, About and Contact pages.</p>
+      <p style={s.hint}>Text and images shown on the public website's homepage, About and Contact pages.</p>
 
-      <div className="card">
+      <div className="card" style={{ marginBottom: 28 }}>
         <form onSubmit={handleSubmit}>
           <div className="form-row">
             <div className="form-group">
@@ -63,11 +98,63 @@ export default function SiteContentPage() {
           </button>
         </form>
       </div>
+
+      <div className="card">
+        <h2 style={s.formTitle}>🖼️ Page Images</h2>
+        <p style={s.hint}>
+          Pick an image straight from your device — it uploads to Cloudinary automatically and
+          saves right away, no URL needed.
+        </p>
+        <div style={s.imageGrid}>
+          {IMAGE_FIELDS.map(({ key, folder, label, hint }) => (
+            <div key={key} style={s.imageCard}>
+              <div style={s.imagePreviewWrap}>
+                {form[key] ? (
+                  <img src={form[key]} alt={label} style={s.imagePreview} />
+                ) : (
+                  <div style={s.imagePlaceholder}>No image set</div>
+                )}
+              </div>
+              <p style={s.imageLabel}>{label}</p>
+              <p style={s.imageHint}>{hint}</p>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 8 }}>
+                <label className="btn btn-gold btn-sm" style={{ cursor: 'pointer' }}>
+                  {uploadingKey === key ? <span className="spinner" /> : (form[key] ? 'Replace' : 'Upload')}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                    disabled={uploadingKey === key}
+                    onChange={e => {
+                      const file = e.target.files[0]
+                      handlePickImage(key, folder, file)
+                      e.target.value = ''
+                    }}
+                  />
+                </label>
+                {form[key] && (
+                  <button type="button" className="btn btn-red btn-sm" onClick={() => handleRemoveImage(key)} disabled={uploadingKey === key}>
+                    🗑️ Remove
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   )
 }
 
 const s = {
-  title: { fontSize: 22, fontWeight: 800, color: 'var(--text)', marginBottom: 6 },
-  hint:  { color: 'var(--muted)', fontSize: 13, marginBottom: 24 },
+  title:     { fontSize: 22, fontWeight: 800, color: 'var(--text)', marginBottom: 6 },
+  hint:      { color: 'var(--muted)', fontSize: 13, marginBottom: 24, maxWidth: '60ch' },
+  formTitle: { fontSize: 15, fontWeight: 700, color: 'var(--gold2)', marginBottom: 4 },
+  imageGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(230px, 1fr))', gap: 16, marginTop: 16 },
+  imageCard: { background: 'var(--card2)', borderRadius: 12, border: '1px solid var(--border)', padding: 12 },
+  imagePreviewWrap: { width: '100%', height: 120, borderRadius: 8, overflow: 'hidden', background: 'var(--bg, #0d0a1a)', marginBottom: 10 },
+  imagePreview: { width: '100%', height: '100%', objectFit: 'cover' },
+  imagePlaceholder: { width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--dim)', fontSize: 12 },
+  imageLabel: { fontSize: 13, fontWeight: 700, color: 'var(--text)' },
+  imageHint:  { fontSize: 11, color: 'var(--muted)', marginTop: 2 },
 }
