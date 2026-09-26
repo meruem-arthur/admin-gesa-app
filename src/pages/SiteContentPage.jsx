@@ -7,14 +7,19 @@ const EMPTY = {
   tagline: 'The Eye of the Engineer', campus: 'Essikado', aboutText: '',
   contactEmail: '', contactPhone: '',
   sidebarImageUrl: '', aboutHeroImageUrl: '', aboutSecondImageUrl: '', contactHeroImageUrl: '',
+  libraryHeroImageUrl: '', eventsHeroImageUrl: '', executivesHeroImageUrl: '',
+  vision: '', mission: '', coreValues: '', activities: '',
 }
 
 // Each entry: the siteContent field it writes, the Cloudinary folder, and its label/hint
 const IMAGE_FIELDS = [
-  { key: 'sidebarImageUrl',      folder: 'gesa/site/sidebar', label: 'Sidebar background image',   hint: 'Shown behind the mobile navigation menu on the public site.' },
-  { key: 'aboutHeroImageUrl',    folder: 'gesa/site/about',   label: 'About page — hero image',     hint: 'Top banner image on the About page.' },
-  { key: 'aboutSecondImageUrl',  folder: 'gesa/site/about',   label: 'About page — secondary image', hint: 'Image shown alongside the "Who Are We" / departments section.' },
-  { key: 'contactHeroImageUrl',  folder: 'gesa/site/contact', label: 'Contact page — hero image',   hint: 'Top banner image on the Contact page.' },
+  { key: 'sidebarImageUrl',        folder: 'gesa/site/sidebar',    label: 'Sidebar background image',     hint: 'Shown behind the mobile navigation menu on the public site.' },
+  { key: 'aboutHeroImageUrl',      folder: 'gesa/site/about',      label: 'About page — hero image',      hint: 'Top banner image on the About page.' },
+  { key: 'aboutSecondImageUrl',    folder: 'gesa/site/about',      label: 'About page — secondary image', hint: 'Image shown alongside the "Who Are We" section.' },
+  { key: 'contactHeroImageUrl',    folder: 'gesa/site/contact',    label: 'Contact page — hero image',    hint: 'Top banner image on the Contact page.' },
+  { key: 'libraryHeroImageUrl',    folder: 'gesa/site/library',    label: 'Library page — hero image',    hint: 'Top banner image on the Library page.' },
+  { key: 'eventsHeroImageUrl',     folder: 'gesa/site/events',     label: 'Events page — hero image',     hint: 'Top banner image on the Events page.' },
+  { key: 'executivesHeroImageUrl', folder: 'gesa/site/executives', label: 'Executives page — hero image', hint: 'Top banner image on the Executives page.' },
 ]
 
 export default function SiteContentPage() {
@@ -71,7 +76,7 @@ export default function SiteContentPage() {
         <form onSubmit={handleSubmit}>
           <div className="form-row">
             <div className="form-group">
-              <label>Hero tagline</label>
+              <label>Hero tagline (also used as the About page slogan)</label>
               <input value={form.tagline} onChange={e => setForm(f => ({ ...f, tagline: e.target.value }))} placeholder="The Eye of the Engineer" />
             </div>
             <div className="form-group">
@@ -82,6 +87,26 @@ export default function SiteContentPage() {
           <div className="form-group">
             <label>About text</label>
             <textarea value={form.aboutText} onChange={e => setForm(f => ({ ...f, aboutText: e.target.value }))} placeholder="Who GESA is and what the association does…" style={{ minHeight: 140 }} />
+          </div>
+          <div className="form-row">
+            <div className="form-group">
+              <label>Vision</label>
+              <textarea value={form.vision} onChange={e => setForm(f => ({ ...f, vision: e.target.value }))} placeholder="To be a leading student association promoting…" style={{ minHeight: 90 }} />
+            </div>
+            <div className="form-group">
+              <label>Mission</label>
+              <textarea value={form.mission} onChange={e => setForm(f => ({ ...f, mission: e.target.value }))} placeholder="To empower students through academic support…" style={{ minHeight: 90 }} />
+            </div>
+          </div>
+          <div className="form-row">
+            <div className="form-group">
+              <label>Core values (one per line, "Label: description")</label>
+              <textarea value={form.coreValues} onChange={e => setForm(f => ({ ...f, coreValues: e.target.value }))} placeholder={'Integrity: Upholding ethical standards in all activities.\nExcellence: Striving for academic and professional distinction.'} style={{ minHeight: 120 }} />
+            </div>
+            <div className="form-group">
+              <label>Activities (one per line, "Label: description")</label>
+              <textarea value={form.activities} onChange={e => setForm(f => ({ ...f, activities: e.target.value }))} placeholder={'Academic: Lectures, workshops, and study trips.\nProfessional: Networking sessions with industry experts.'} style={{ minHeight: 120 }} />
+            </div>
           </div>
           <div className="form-row">
             <div className="form-group">
