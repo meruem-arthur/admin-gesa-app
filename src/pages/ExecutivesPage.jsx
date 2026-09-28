@@ -3,7 +3,7 @@ import { getExecutives, addExecutive, updateExecutive, deleteExecutive } from '.
 import { uploadPhoto } from '../cloudinary'
 import { useToast } from '../hooks/useToast'
 
-const EMPTY = { name: '', position: '', order: '', phone: '', bio: '', photoUrl: '' }
+const EMPTY = { name: '', position: '', order: '', phone: '', bio: '', photoUrl: '', welcomeMessage: '' }
 
 export default function ExecutivesPage() {
   const [list, setList]           = useState([])
@@ -26,6 +26,7 @@ export default function ExecutivesPage() {
       phone: ex.phone || '',
       bio: ex.bio || '',
       photoUrl: ex.photoUrl || '',
+      welcomeMessage: ex.welcomeMessage || '',
     })
     setPhotoFile(null)
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -78,6 +79,10 @@ export default function ExecutivesPage() {
               {form.photoUrl && !photoFile && <img src={form.photoUrl} alt="" style={s.photoThumb} />}
             </div>
             <div className="form-group"><label>Bio (optional)</label><textarea value={form.bio} onChange={e => setForm(f => ({ ...f, bio: e.target.value }))} placeholder="Short bio…" style={{ minHeight: 40 }} /></div>
+          </div>
+          <div className="form-group">
+            <label>Welcome message (shown on the public homepage when this is the President — Order 1)</label>
+            <textarea value={form.welcomeMessage} onChange={e => setForm(f => ({ ...f, welcomeMessage: e.target.value }))} placeholder="Welcome to GESA Essikado…" style={{ minHeight: 90 }} />
           </div>
           <div style={{ display: 'flex', gap: 10 }}>
             <button type="submit" className="btn btn-gold" disabled={saving}>{saving ? <span className="spinner" /> : editId ? 'Update' : 'Save Executive'}</button>

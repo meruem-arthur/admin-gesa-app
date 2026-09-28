@@ -7,7 +7,7 @@ const EMPTY = {
   tagline: 'The Eye of the Engineer', campus: 'Essikado', aboutText: '',
   contactEmail: '', contactPhone: '',
   sidebarImageUrl: '', aboutHeroImageUrl: '', aboutSecondImageUrl: '', contactHeroImageUrl: '',
-  libraryHeroImageUrl: '', eventsHeroImageUrl: '', executivesHeroImageUrl: '',
+  libraryHeroImageUrl: '', eventsHeroImageUrl: '', executivesHeroImageUrl: '', lecturersHeroImageUrl: '',
   vision: '', mission: '', coreValues: '', activities: '',
 }
 
@@ -20,6 +20,7 @@ const IMAGE_FIELDS = [
   { key: 'libraryHeroImageUrl',    folder: 'gesa/site/library',    label: 'Library page — hero image',    hint: 'Top banner image on the Library page.' },
   { key: 'eventsHeroImageUrl',     folder: 'gesa/site/events',     label: 'Events page — hero image',     hint: 'Top banner image on the Events page.' },
   { key: 'executivesHeroImageUrl', folder: 'gesa/site/executives', label: 'Executives page — hero image', hint: 'Top banner image on the Executives page.' },
+  { key: 'lecturersHeroImageUrl',  folder: 'gesa/site/lecturers',  label: 'Lecturers page — hero image',  hint: 'Top banner image on the Lecturers page.' },
 ]
 
 export default function SiteContentPage() {

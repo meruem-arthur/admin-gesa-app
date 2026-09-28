@@ -26,6 +26,7 @@ export const getExecutives = () => fetchCollection('executives', orderBy('order'
 export const addExecutive  = d => addDoc(collection(db, 'executives'), {
   name: d.name, position: d.position, order: Number(d.order) || 99,
   photoUrl: d.photoUrl || '', phone: d.phone || '', bio: d.bio || '',
+  welcomeMessage: d.welcomeMessage || '',
 })
 export const updateExecutive = (id, d) => updateItem('executives', id, d)
 export const deleteExecutive = id => deleteItem('executives', id)
