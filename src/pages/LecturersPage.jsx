@@ -3,13 +3,13 @@ import { getLecturers, addLecturer, updateLecturer, deleteLecturer } from '../ho
 import { uploadPhoto } from '../cloudinary'
 import { useToast } from '../hooks/useToast'
 
-// pinnedRole: '' | 'HOD' | 'Dean'
+// pinnedRole: '' | 'HOD' | 'Principal'  (legacy 'Dean' records are treated as Principal)
 const EMPTY = { name: '', title: '', major: '', phone: '', email: '', pinnedRole: '', photoUrl: '', hodMessage: '' }
 
 const PIN_OPTIONS = [
   { value: '',     label: 'None' },
   { value: 'HOD',  label: 'HOD'  },
-  { value: 'Dean', label: 'Dean' },
+  { value: 'Principal', label: 'Principal' },
 ]
 
 export default function LecturersPage() {
@@ -44,7 +44,7 @@ export default function LecturersPage() {
       major: lec.major || '',
       phone: lec.phone || '',
       email: lec.email || '',
-      pinnedRole: lec.pinnedRole || '',
+      pinnedRole: lec.pinnedRole === 'Dean' ? 'Principal' : (lec.pinnedRole || ''),
       photoUrl: lec.photoUrl || '',
       hodMessage: lec.hodMessage || '',
     })
@@ -99,7 +99,7 @@ export default function LecturersPage() {
             </div>
           </div>
 
-          {/* Pin role — None / HOD / Dean (mutually exclusive) */}
+          {/* Pin role — None / HOD / Principal (mutually exclusive) */}
           <div className="form-group">
             <label>Pin as (shows at top of list)</label>
             <div className="chip-group" style={{ marginTop: 6 }}>
@@ -151,7 +151,7 @@ export default function LecturersPage() {
                     <td style={{color:'var(--gold2)', fontSize:12}}>{lec.phone}</td>
                     <td>
                       {lec.pinnedRole === 'HOD'  ? <span className="badge badge-gold">HOD</span>
-                        : lec.pinnedRole === 'Dean' ? <span className="badge badge-gold">Dean</span>
+                        : (lec.pinnedRole === 'Principal' || lec.pinnedRole === 'Dean') ? <span className="badge badge-gold">Principal</span>
                         : <span className="badge badge-purple">Lecturer</span>
                       }
                     </td>

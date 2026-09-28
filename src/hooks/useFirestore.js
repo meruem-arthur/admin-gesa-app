@@ -36,7 +36,7 @@ export const getLecturers = () => fetchCollection('lecturers')
 export const addLecturer  = d => addDoc(collection(db, 'lecturers'), {
   name: d.name, title: d.title || 'Lecturer', major: d.major || '',
   phone: d.phone || '', email: d.email || '',
-  pinnedRole: d.pinnedRole || '', // '' | 'HOD' | 'Dean'
+  pinnedRole: d.pinnedRole || '', // '' | 'HOD' | 'Principal'
   photoUrl: d.photoUrl || '',
   hodMessage: d.hodMessage || '',
 })
