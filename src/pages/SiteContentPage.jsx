@@ -7,7 +7,8 @@ const EMPTY = {
   tagline: 'The Eye of the Engineer', campus: 'Essikado', aboutText: '',
   contactEmail: '', contactPhone: '',
   sidebarImageUrl: '', aboutHeroImageUrl: '', aboutSecondImageUrl: '', contactHeroImageUrl: '',
-  libraryHeroImageUrl: '', eventsHeroImageUrl: '', executivesHeroImageUrl: '', lecturersHeroImageUrl: '',
+  libraryHeroImageUrl: '', eventsHeroImageUrl: '', executivesHeroImageUrl: '', lecturersHeroImageUrl: '', welfareHeroImageUrl: '',
+  clinicPhone: '', clinicNote: '',
   vision: '', mission: '', coreValues: '', activities: '',
 }
 
@@ -20,6 +21,7 @@ const IMAGE_FIELDS = [
   { key: 'libraryHeroImageUrl',    folder: 'gesa/site/library',    label: 'Library page — hero image',    hint: 'Top banner image on the Library page.' },
   { key: 'eventsHeroImageUrl',     folder: 'gesa/site/events',     label: 'Events page — hero image',     hint: 'Top banner image on the Events page.' },
   { key: 'executivesHeroImageUrl', folder: 'gesa/site/executives', label: 'Executives page — hero image', hint: 'Top banner image on the Executives page.' },
+  { key: 'welfareHeroImageUrl',    folder: 'gesa/site/welfare',    label: 'Talk to Someone page — hero image', hint: 'Top banner image on the Talk to Someone (welfare) page.' },
   { key: 'lecturersHeroImageUrl',  folder: 'gesa/site/lecturers',  label: 'Lecturers page — hero image',  hint: 'Top banner image on the Lecturers page.' },
 ]
 
@@ -117,6 +119,16 @@ export default function SiteContentPage() {
             <div className="form-group">
               <label>Contact phone</label>
               <input value={form.contactPhone} onChange={e => setForm(f => ({ ...f, contactPhone: e.target.value }))} placeholder="+233 24 000 0000" />
+            </div>
+          </div>
+          <div className="form-row">
+            <div className="form-group">
+              <label>School clinic phone (Talk to Someone page — leave empty to hide the clinic section)</label>
+              <input value={form.clinicPhone} onChange={e => setForm(f => ({ ...f, clinicPhone: e.target.value }))} placeholder="+233 …" />
+            </div>
+            <div className="form-group">
+              <label>Clinic note (optional — e.g. opening hours)</label>
+              <input value={form.clinicNote} onChange={e => setForm(f => ({ ...f, clinicNote: e.target.value }))} placeholder="Open 24 hours for emergencies" />
             </div>
           </div>
           <button type="submit" className="btn btn-gold" disabled={saving}>

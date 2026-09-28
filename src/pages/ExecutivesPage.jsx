@@ -3,7 +3,7 @@ import { getExecutives, addExecutive, updateExecutive, deleteExecutive } from '.
 import { uploadPhoto } from '../cloudinary'
 import { useToast } from '../hooks/useToast'
 
-const EMPTY = { name: '', position: '', order: '', phone: '', bio: '', photoUrl: '', welcomeMessage: '' }
+const EMPTY = { name: '', position: '', order: '', phone: '', bio: '', photoUrl: '', welcomeMessage: '', whatsapp: '', isWelfareChair: false }
 
 export default function ExecutivesPage() {
   const [list, setList]           = useState([])
@@ -27,6 +27,8 @@ export default function ExecutivesPage() {
       bio: ex.bio || '',
       photoUrl: ex.photoUrl || '',
       welcomeMessage: ex.welcomeMessage || '',
+      whatsapp: ex.whatsapp || '',
+      isWelfareChair: !!ex.isWelfareChair,
     })
     setPhotoFile(null)
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -74,6 +76,19 @@ export default function ExecutivesPage() {
           </div>
           <div className="form-row">
             <div className="form-group">
+              <label>WhatsApp number (optional — leave empty to use the phone number above)</label>
+              <input value={form.whatsapp} onChange={e => setForm(f => ({ ...f, whatsapp: e.target.value }))} placeholder="+233 24 000 0001" />
+            </div>
+            <div className="form-group">
+              <label>Talk to Someone page</label>
+              <label style={s.checkRow}>
+                <input type="checkbox" checked={!!form.isWelfareChair} onChange={e => setForm(f => ({ ...f, isWelfareChair: e.target.checked }))} style={s.checkbox} />
+                <span>This person is the Welfare Chairman — show their photo and contact on the website and app</span>
+              </label>
+            </div>
+          </div>
+          <div className="form-row">
+            <div className="form-group">
               <label>Photo</label>
               <input type="file" accept="image/*" onChange={e => setPhotoFile(e.target.files[0])} style={{ padding: '8px 12px' }} />
               {form.photoUrl && !photoFile && <img src={form.photoUrl} alt="" style={s.photoThumb} />}
@@ -109,7 +124,10 @@ export default function ExecutivesPage() {
                       </div>
                     </td>
                     <td style={{ fontWeight: 600 }}>{ex.name}</td>
-                    <td><span className="badge badge-gold">{ex.position}</span></td>
+                    <td>
+                      <span className="badge badge-gold">{ex.position}</span>
+                      {ex.isWelfareChair && <span className="badge badge-purple" style={{ marginLeft: 6 }}>🤝 Talk to Someone</span>}
+                    </td>
                     <td style={{ color: 'var(--gold2)', fontSize: 12 }}>{ex.phone || '—'}</td>
                     <td>
                       <div style={{ display: 'flex', gap: 8 }}>
@@ -130,5 +148,7 @@ export default function ExecutivesPage() {
 const s = {
   title:     { fontSize: 22, fontWeight: 800, color: 'var(--text)', marginBottom: 24 },
   formTitle: { fontSize: 15, fontWeight: 700, color: 'var(--gold2)', marginBottom: 16 },
+  checkRow:  { display: 'flex', alignItems: 'flex-start', gap: 10, fontWeight: 400, fontSize: 13, color: 'var(--text)', cursor: 'pointer', marginTop: 6, lineHeight: 1.4 },
+  checkbox:  { width: 18, height: 18, flex: 'none', marginTop: 1, padding: 0, accentColor: '#e8b82a' },
   photoThumb:{ width: 48, height: 48, borderRadius: 24, objectFit: 'cover', marginTop: 6, border: '2px solid rgba(212,160,23,0.3)' },
 }
