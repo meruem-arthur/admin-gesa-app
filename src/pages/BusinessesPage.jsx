@@ -5,7 +5,7 @@ import { useToast } from '../hooks/useToast'
 
 const EMPTY = {
   name: '', shortDescription: '', description: '', ownerName: '',
-  phone: '', whatsapp: '', email: '',
+  phone: '', whatsapp: '', email: '', website: '',
   logoUrl: '', ownerPhotoUrl: '', order: '', visible: true,
 }
 
@@ -61,6 +61,7 @@ export default function BusinessesPage() {
       phone: b.phone || '',
       whatsapp: b.whatsapp || '',
       email: b.email || '',
+      website: b.website || '',
       logoUrl: b.logoUrl || '',
       ownerPhotoUrl: b.ownerPhotoUrl || '',
       order: String(b.order && b.order !== 99 ? b.order : ''),
@@ -96,6 +97,7 @@ export default function BusinessesPage() {
         phone: form.phone.trim(),
         whatsapp: form.whatsapp.trim(),
         email: form.email.trim(),
+        website: form.website.trim(),
         logoUrl, ownerPhotoUrl,
         order: Number(form.order) || 99,
         visible: !!form.visible,
@@ -156,7 +158,15 @@ export default function BusinessesPage() {
           </div>
           <div className="form-row">
             <div className="form-group"><label>Email</label><input type="email" value={form.email} onChange={set('email')} placeholder="business@example.com" /></div>
+            <div className="form-group">
+              <label>Website <span style={{ color: 'var(--dim)', fontWeight: 400 }}>(optional)</span></label>
+              <input value={form.website} onChange={set('website')} placeholder="e.g. amaskitchen.com" />
+              <p style={s.fieldHint}>Leave empty if the business has no website.</p>
+            </div>
+          </div>
+          <div className="form-row">
             <div className="form-group"><label>Order (1 = shown first)</label><input type="number" value={form.order} onChange={set('order')} placeholder="1" /></div>
+            <div className="form-group" />
           </div>
 
           <div className="form-row">
