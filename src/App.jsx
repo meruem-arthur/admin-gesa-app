@@ -25,6 +25,7 @@ import HeroSlidesPage   from './pages/HeroSlidesPage'
 import SiteGalleryPage  from './pages/SiteGalleryPage'
 import SiteContentPage  from './pages/SiteContentPage'
 import SiteLinksPage    from './pages/SiteLinksPage'
+import BusinessesPage   from './pages/BusinessesPage'
 
 export default function App() {
   const [user, setUser]       = useState(null)
@@ -107,6 +108,7 @@ export default function App() {
                   <Route path="/"              element={<Dashboard />} />
                   <Route path="/executives"    element={<ExecutivesPage />} />
                   <Route path="/lecturers"     element={<LecturersPage />} />
+                  <Route path="/businesses"    element={<BusinessesPage />} />
                   <Route path="/events"        element={<EventsPage />} />
                   <Route path="/announcements" element={<AnnouncementsPage />} />
                   <Route path="/words"         element={<WordsPage />} />

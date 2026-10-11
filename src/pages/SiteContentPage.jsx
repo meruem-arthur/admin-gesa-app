@@ -7,7 +7,8 @@ const EMPTY = {
   tagline: 'The Eye of the Engineer', campus: 'Essikado', aboutText: '',
   contactEmail: '', contactPhone: '',
   sidebarImageUrl: '', aboutHeroImageUrl: '', aboutSecondImageUrl: '', contactHeroImageUrl: '',
-  libraryHeroImageUrl: '', eventsHeroImageUrl: '', executivesHeroImageUrl: '', lecturersHeroImageUrl: '', welfareHeroImageUrl: '',
+  libraryHeroImageUrl: '', eventsHeroImageUrl: '', executivesHeroImageUrl: '', lecturersHeroImageUrl: '', welfareHeroImageUrl: '', businessHeroImageUrl: '',
+  businessHeroTitle: '', businessHeroSubtitle: '',
   clinicPhone: '', clinicNote: '',
   vision: '', mission: '', coreValues: '', activities: '',
 }
@@ -22,6 +23,7 @@ const IMAGE_FIELDS = [
   { key: 'eventsHeroImageUrl',     folder: 'gesa/site/events',     label: 'Events page — hero image',     hint: 'Top banner image on the Events page.' },
   { key: 'executivesHeroImageUrl', folder: 'gesa/site/executives', label: 'Executives page — hero image', hint: 'Top banner image on the Executives page.' },
   { key: 'welfareHeroImageUrl',    folder: 'gesa/site/welfare',    label: 'Talk to Someone page — hero image', hint: 'Top banner image on the Talk to Someone (welfare) page.' },
+  { key: 'businessHeroImageUrl',   folder: 'gesa/site/business',   label: 'Business Hub page — hero image', hint: 'Top banner image on the Business Hub page.' },
   { key: 'lecturersHeroImageUrl',  folder: 'gesa/site/lecturers',  label: 'Lecturers page — hero image',  hint: 'Top banner image on the Lecturers page.' },
 ]
 
@@ -129,6 +131,16 @@ export default function SiteContentPage() {
             <div className="form-group">
               <label>Clinic note (optional — e.g. opening hours)</label>
               <input value={form.clinicNote} onChange={e => setForm(f => ({ ...f, clinicNote: e.target.value }))} placeholder="Open 24 hours for emergencies" />
+            </div>
+          </div>
+          <div className="form-row">
+            <div className="form-group">
+              <label>Business Hub headline (leave empty for the default)</label>
+              <input value={form.businessHeroTitle} onChange={e => setForm(f => ({ ...f, businessHeroTitle: e.target.value }))} placeholder="Get in touch with student business entrepreneurs in GESA" />
+            </div>
+            <div className="form-group">
+              <label>Business Hub subtitle (optional)</label>
+              <input value={form.businessHeroSubtitle} onChange={e => setForm(f => ({ ...f, businessHeroSubtitle: e.target.value }))} placeholder="Support student-owned businesses…" />
             </div>
           </div>
           <button type="submit" className="btn btn-gold" disabled={saving}>

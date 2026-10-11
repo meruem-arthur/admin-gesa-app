@@ -28,6 +28,7 @@ Your dashboard will be live at `https://gesa-admin.vercel.app` (or similar)
 |----------------|----------------------------------|
 | Executives     | Add, edit, delete, upload photo  |
 | Lecturers      | Add, edit, delete, upload photo  |
+| Business Hub   | Add, edit, delete, hide, logo & owner photo |
 | Events         | Add, delete                      |
 | Announcements  | Post, delete                     |
 | Word of Day    | Add, delete                      |

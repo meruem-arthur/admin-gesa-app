@@ -5,6 +5,7 @@ const NAV = [
   { to: '/',              icon: '📊', label: 'Dashboard'      },
   { to: '/executives',    icon: '🎖️', label: 'Executives'     },
   { to: '/lecturers',     icon: '🎓', label: 'Lecturers'      },
+  { to: '/businesses',    icon: '🏪', label: 'Business Hub'   },
   { to: '/events',        icon: '📅', label: 'Events'         },
   { to: '/announcements', icon: '📢', label: 'Announcements'  },
   { to: '/words',         icon: '📖', label: 'Word of Day'    },

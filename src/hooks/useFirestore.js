@@ -33,6 +33,21 @@ export const addExecutive  = d => addDoc(collection(db, 'executives'), {
 export const updateExecutive = (id, d) => updateItem('executives', id, d)
 export const deleteExecutive = id => deleteItem('executives', id)
 
+// ─── Business Hub ─────────────────────────────────────────────────────────────
+// businesses: { name, shortDescription, description, ownerName, phone, whatsapp,
+//               email, logoUrl, ownerPhotoUrl, order, visible, createdAt }
+export const getBusinesses = () => fetchCollection('businesses', orderBy('order', 'asc'))
+export const addBusiness   = d => addDoc(collection(db, 'businesses'), {
+  name: d.name, shortDescription: d.shortDescription || '',
+  description: d.description || '', ownerName: d.ownerName || '',
+  phone: d.phone || '', whatsapp: d.whatsapp || '', email: d.email || '',
+  logoUrl: d.logoUrl || '', ownerPhotoUrl: d.ownerPhotoUrl || '',
+  order: Number(d.order) || 99, visible: d.visible !== false,
+  createdAt: Timestamp.now(),
+})
+export const updateBusiness = (id, d) => updateItem('businesses', id, d)
+export const deleteBusiness = id => deleteItem('businesses', id)
+
 // ─── Lecturers ────────────────────────────────────────────────────────────────
 export const getLecturers = () => fetchCollection('lecturers')
 export const addLecturer  = d => addDoc(collection(db, 'lecturers'), {
