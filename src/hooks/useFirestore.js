@@ -1,6 +1,6 @@
 import {
   collection, getDocs, addDoc, updateDoc, deleteDoc,
-  doc, query, orderBy, Timestamp, setDoc,
+  doc, query, orderBy, Timestamp, setDoc, writeBatch,
 } from 'firebase/firestore'
 import { db } from '../firebase'
 
@@ -87,6 +87,20 @@ export const addWord     = d => addDoc(collection(db, 'wordOfTheDay'), {
   example: d.example || '', date: d.date,
 })
 export const deleteWord  = id => deleteItem('wordOfTheDay', id)
+// Adds many words at once (each already carries its own date). Firestore batches
+// are capped at 500 writes, so big lists are saved in chunks.
+export async function addWordsBulk(words) {
+  for (let i = 0; i < words.length; i += 400) {
+    const batch = writeBatch(db)
+    words.slice(i, i + 400).forEach(w => {
+      batch.set(doc(collection(db, 'wordOfTheDay')), {
+        word: w.word, type: w.type || '', definition: w.definition,
+        example: w.example || '', date: w.date,
+      })
+    })
+    await batch.commit()
+  }
+}
 
 // ─── Materials ────────────────────────────────────────────────────────────────
 export const getMaterials  = () => fetchCollection('learningMaterials', orderBy('level', 'asc'))
