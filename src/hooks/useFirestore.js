@@ -35,13 +35,14 @@ export const deleteExecutive = id => deleteItem('executives', id)
 
 // ─── Business Hub ─────────────────────────────────────────────────────────────
 // businesses: { name, shortDescription, description, ownerName, phone, whatsapp,
-//               email, website, logoUrl, ownerPhotoUrl, order, visible, createdAt }
+//               email, website, products: [{ name, price, imageUrl }] (max 3), logoUrl, ownerPhotoUrl, order, visible, createdAt }
 export const getBusinesses = () => fetchCollection('businesses', orderBy('order', 'asc'))
 export const addBusiness   = d => addDoc(collection(db, 'businesses'), {
   name: d.name, shortDescription: d.shortDescription || '',
   description: d.description || '', ownerName: d.ownerName || '',
   phone: d.phone || '', whatsapp: d.whatsapp || '', email: d.email || '',
   website: d.website || '',
+  products: d.products || [],
   logoUrl: d.logoUrl || '', ownerPhotoUrl: d.ownerPhotoUrl || '',
   order: Number(d.order) || 99, visible: d.visible !== false,
   createdAt: Timestamp.now(),

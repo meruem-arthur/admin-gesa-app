@@ -3,10 +3,15 @@ import { getBusinesses, addBusiness, updateBusiness, deleteBusiness } from '../h
 import { uploadPhoto } from '../cloudinary'
 import { useToast } from '../hooks/useToast'
 
+const MAX_PRODUCTS = 3
+const emptyProduct = () => ({ name: '', price: '', imageUrl: '' })
+const emptyProducts = () => Array.from({ length: MAX_PRODUCTS }, emptyProduct)
+
 const EMPTY = {
   name: '', shortDescription: '', description: '', ownerName: '',
   phone: '', whatsapp: '', email: '', website: '',
   logoUrl: '', ownerPhotoUrl: '', order: '', visible: true,
+  products: emptyProducts(),
 }
 
 // Optional image picker: shows the current (or newly picked) image and lets the
@@ -43,6 +48,7 @@ export default function BusinessesPage() {
   const [editId, setEditId]     = useState(null)
   const [logoFile, setLogoFile] = useState(null)
   const [ownerFile, setOwnerFile] = useState(null)
+  const [productFiles, setProductFiles] = useState(Array(MAX_PRODUCTS).fill(null))
   const [saving, setSaving]     = useState(false)
   const { show, Toast }         = useToast()
 
@@ -66,12 +72,21 @@ export default function BusinessesPage() {
       ownerPhotoUrl: b.ownerPhotoUrl || '',
       order: String(b.order && b.order !== 99 ? b.order : ''),
       visible: b.visible !== false,
+      products: Array.from({ length: MAX_PRODUCTS }, (_, i) => ({ ...emptyProduct(), ...(b.products?.[i] || {}) })),
     })
-    setLogoFile(null); setOwnerFile(null)
+    setLogoFile(null); setOwnerFile(null); setProductFiles(Array(MAX_PRODUCTS).fill(null))
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  function reset() { setEditId(null); setForm(EMPTY); setLogoFile(null); setOwnerFile(null) }
+  function reset() {
+    setEditId(null); setForm({ ...EMPTY, products: emptyProducts() })
+    setLogoFile(null); setOwnerFile(null); setProductFiles(Array(MAX_PRODUCTS).fill(null))
+  }
+
+  const setProduct = (i, changes) =>
+    setForm(f => ({ ...f, products: f.products.map((p, j) => (j === i ? { ...p, ...changes } : p)) }))
+  const setProductFile = (i, file) => setProductFiles(fs => fs.map((x, j) => (j === i ? file : x)))
+  function clearProduct(i) { setProduct(i, emptyProduct()); setProductFile(i, null) }
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -81,14 +96,23 @@ export default function BusinessesPage() {
     if (!form.phone.trim() && !form.whatsapp.trim() && !form.email.trim()) {
       return show('Add at least one contact (phone, WhatsApp or email)', 'error')
     }
+    const lonelyPrice = form.products.findIndex((p, i) => p.price.trim() && !p.name.trim() && !p.imageUrl && !productFiles[i])
+    if (lonelyPrice !== -1) {
+      return show(`Product ${lonelyPrice + 1} has a price but no photo or name`, 'error')
+    }
     setSaving(true)
     try {
       // Images are optional. Keep the saved URL, replace it if a new file was
       // picked, or clear it if the admin pressed Remove (url already '').
-      const [logoUrl, ownerPhotoUrl] = await Promise.all([
+      const [logoUrl, ownerPhotoUrl, ...productUrls] = await Promise.all([
         logoFile  ? uploadPhoto(logoFile,  'gesa/businesses/logos')  : form.logoUrl,
         ownerFile ? uploadPhoto(ownerFile, 'gesa/businesses/owners') : form.ownerPhotoUrl,
+        ...form.products.map((p, i) => (productFiles[i] ? uploadPhoto(productFiles[i], 'gesa/businesses/products') : p.imageUrl)),
       ])
+      // Products are optional: a slot with neither a name nor a photo is simply left out.
+      const products = form.products
+        .map((p, i) => ({ name: p.name.trim(), price: p.price.trim(), imageUrl: productUrls[i] || '' }))
+        .filter(p => p.name || p.imageUrl)
       const data = {
         name: form.name.trim(),
         shortDescription: form.shortDescription.trim(),
@@ -98,7 +122,7 @@ export default function BusinessesPage() {
         whatsapp: form.whatsapp.trim(),
         email: form.email.trim(),
         website: form.website.trim(),
-        logoUrl, ownerPhotoUrl,
+        logoUrl, ownerPhotoUrl, products,
         order: Number(form.order) || 99,
         visible: !!form.visible,
       }
@@ -187,6 +211,35 @@ export default function BusinessesPage() {
           </div>
 
           <div className="form-group">
+            <label>Products <span style={{ color: 'var(--dim)', fontWeight: 400 }}>(optional, up to {MAX_PRODUCTS})</span></label>
+            <p style={s.fieldHint}>Shown on the business's page. Each product needs at least a photo or a name. The price is optional, so leave it empty if the owner doesn't want one shown.</p>
+            <div style={s.productGrid}>
+              {form.products.map((p, i) => (
+                <div key={i} style={s.productBox}>
+                  <p style={s.productTitle}>Product {i + 1}</p>
+                  <ImageField
+                    label="Photo"
+                    url={p.imageUrl} file={productFiles[i]}
+                    onPick={f => setProductFile(i, f)}
+                    onRemove={() => { setProductFile(i, null); setProduct(i, { imageUrl: '' }) }}
+                  />
+                  <div className="form-group">
+                    <label>Name</label>
+                    <input value={p.name} onChange={e => setProduct(i, { name: e.target.value })} placeholder="e.g. Air Force 1" />
+                  </div>
+                  <div className="form-group">
+                    <label>Price <span style={{ color: 'var(--dim)', fontWeight: 400 }}>(optional)</span></label>
+                    <input value={p.price} onChange={e => setProduct(i, { price: e.target.value })} placeholder="e.g. GH₵ 250" />
+                  </div>
+                  {(p.name || p.price || p.imageUrl || productFiles[i]) && (
+                    <button type="button" className="btn btn-ghost btn-sm" onClick={() => clearProduct(i)}>Clear this product</button>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="form-group">
             <label style={s.checkRow}>
               <input type="checkbox" checked={!!form.visible} onChange={e => setForm(f => ({ ...f, visible: e.target.checked }))} style={s.checkbox} />
               <span>Visible — show this business on the website and in the app</span>
@@ -257,5 +310,8 @@ const s = {
   fieldHint: { color: 'var(--muted)', fontSize: 11, marginTop: 4 },
   thumb:     { width: 56, height: 56, borderRadius: 12, objectFit: 'cover', border: '2px solid rgba(212,160,23,0.3)' },
   checkRow:  { display: 'flex', alignItems: 'flex-start', gap: 10, fontWeight: 400, fontSize: 13, color: 'var(--text)', cursor: 'pointer', lineHeight: 1.4 },
+  productGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: 14, marginTop: 8 },
+  productBox:  { border: '1px solid var(--border)', borderRadius: 10, padding: 14, background: 'var(--card2)' },
+  productTitle:{ fontSize: 12, fontWeight: 700, color: 'var(--gold2)', marginBottom: 10 },
   checkbox:  { width: 18, height: 18, flex: 'none', marginTop: 1, padding: 0, accentColor: '#e8b82a' },
 }
