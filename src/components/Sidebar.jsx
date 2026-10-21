@@ -12,6 +12,7 @@ const NAV = [
   { to: '/materials',     icon: '📚', label: 'Materials'      },
   { to: '/pastquestions', icon: '📄', label: 'Past Questions' },
   { to: '/exams',         icon: '⏰', label: 'Exams'          },
+  { to: '/memes',         icon: '🖼️', label: 'Exam Memes'     },
   { to: '/timetable',     icon: '🗓️', label: 'Timetable'      },
   { to: '/software',      icon: '💾', label: 'Software'        },
   { to: '/tutorials',     icon: '▶️', label: 'Tutorials'       },

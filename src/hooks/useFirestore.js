@@ -103,6 +103,36 @@ export async function addWordsBulk(words) {
   }
 }
 
+// ─── Meme of the day (exam countdown screen) ──────────────────────────────────
+// memes: { imageUrl, reserved, createdAt }
+//   reserved === false → part of the daily rotation (one per day, in upload order)
+//   reserved === true  → never rotates; only shows while the admin has pinned it
+// The pin lives in siteContent/home as `pinnedMemeId` ('' or missing = rotation).
+export const getMemes   = () => fetchCollection('memes', orderBy('createdAt', 'asc'))
+export const addMeme    = d => addDoc(collection(db, 'memes'), {
+  imageUrl: d.imageUrl, reserved: !!d.reserved, createdAt: Timestamp.now(),
+})
+export const updateMeme = (id, d) => updateItem('memes', id, d)
+export const deleteMeme = id => deleteItem('memes', id)
+export async function getPinnedMemeId() {
+  const content = await getSiteContent()
+  return content.pinnedMemeId || ''
+}
+export const setPinnedMemeId = id => updateSiteContent({ pinnedMemeId: id || '' })
+
+// Which meme the app shows right now. Keep identical to pickMemeOfTheDay in the
+// student app (gesa-app/src/hooks/useFirestore.js) so the badge here is truthful.
+export function pickMemeOfTheDay(memes, pinnedId, now = Date.now()) {
+  if (!memes.length) return null
+  if (pinnedId) {
+    const pinned = memes.find(m => m.id === pinnedId)
+    if (pinned) return pinned
+  }
+  const pool = memes.filter(m => !m.reserved)
+  if (!pool.length) return null
+  return pool[Math.floor(now / 86400000) % pool.length]
+}
+
 // ─── Materials ────────────────────────────────────────────────────────────────
 export const getMaterials  = () => fetchCollection('learningMaterials', orderBy('level', 'asc'))
 export const addMaterial   = d => addDoc(collection(db, 'learningMaterials'), {

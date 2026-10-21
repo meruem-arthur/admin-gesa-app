@@ -15,6 +15,7 @@ import WordsPage         from './pages/WordsPage'
 import MaterialsPage     from './pages/MaterialsPage'
 import PastQPage         from './pages/PastQPage'
 import ExamsPage         from './pages/ExamsPage'
+import MemesPage         from './pages/MemesPage'
 import NotificationsPage from './pages/NotificationsPage'
 import ForumPage        from './pages/ForumPage'
 import TimetablePage    from './pages/TimetablePage'
@@ -115,6 +116,7 @@ export default function App() {
                   <Route path="/materials"     element={<MaterialsPage />} />
                   <Route path="/pastquestions" element={<PastQPage />} />
                   <Route path="/exams"         element={<ExamsPage />} />
+                  <Route path="/memes"         element={<MemesPage />} />
                   <Route path="/notifications" element={<NotificationsPage />} />
                   <Route path="/forum"         element={<ForumPage />} />
                   <Route path="/timetable"     element={<TimetablePage />} />
