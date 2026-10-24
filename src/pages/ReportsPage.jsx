@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { getReports, resolveReport, reopenReport, deleteReport } from '../hooks/useFirestore'
 import { useToast } from '../hooks/useToast'
 
@@ -99,8 +100,11 @@ export default function ReportsPage() {
                 }}
               >
                 <div style={s.reportTop}>
-                  <span className={`badge ${r.status === 'resolved' ? 'badge-green' : 'badge-gold'}`}>
-                    {r.status === 'resolved' ? '✓ Resolved' : '● Open'}
+                  <span style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                    <span className={`badge ${r.status === 'resolved' ? 'badge-green' : 'badge-gold'}`}>
+                      {r.status === 'resolved' ? '✓ Resolved' : '● Open'}
+                    </span>
+                    {r.source === 'forum' && <span className="badge badge-purple">💬 Forum</span>}
                   </span>
                   <span style={s.reportTime}>{timeAgo(r.createdAt)}</span>
                 </div>
@@ -110,6 +114,9 @@ export default function ReportsPage() {
                     ? <button className="btn btn-ghost btn-sm" onClick={() => handleReopen(r.id)}>↩️ Reopen</button>
                     : <button className="btn btn-gold btn-sm" onClick={() => handleResolve(r.id)}>✓ Mark Resolved</button>
                   }
+                  {r.source === 'forum' && (
+                    <Link to="/forum" className="btn btn-ghost btn-sm" style={{ textDecoration: 'none' }}>💬 Open Forum</Link>
+                  )}
                   <button className="btn btn-red btn-sm" onClick={() => handleDelete(r.id)}>🗑️ Delete</button>
                 </div>
               </div>

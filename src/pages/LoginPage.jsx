@@ -30,6 +30,9 @@ export default function LoginPage() {
         case 'auth/invalid-credential':
           setErr('Incorrect email or password.')
           break
+        case 'auth/network-request-failed':
+          setErr("Can't reach the server. Check your internet connection and try again. If other sites work, your network's DNS may be blocking Google services.")
+          break
         case 'auth/too-many-requests':
           setErr('Too many attempts. Try again in a few minutes.')
           break

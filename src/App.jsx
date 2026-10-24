@@ -32,6 +32,8 @@ export default function App() {
   const [user, setUser]       = useState(null)
   const [isAdmin, setIsAdmin] = useState(false)
   const [checking, setChecking] = useState(true)
+  const [netError, setNetError] = useState(false)   // couldn't reach Firebase to verify admin access
+  const [attempt, setAttempt]   = useState(0)       // bump to re-run the check
 
   useEffect(() => {
     // Fires on load and whenever sign-in/sign-out happens. For a signed-in
@@ -39,14 +41,22 @@ export default function App() {
     // having a Firebase account isn't the same as being an admin.
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       setUser(firebaseUser)
+      setNetError(false)
       if (firebaseUser) {
         try {
           const snap = await getDoc(doc(db, 'admins', firebaseUser.uid))
           setIsAdmin(snap.exists())
-        } catch {
-          // Firestore rules deny this read for non-admins, which throws —
-          // that denial itself means "not an admin".
-          setIsAdmin(false)
+        } catch (err) {
+          if (err?.code === 'permission-denied') {
+            // Firestore rules deny this read for non-admins, which throws —
+            // that denial itself means "not an admin".
+            setIsAdmin(false)
+          } else {
+            // Offline, DNS failure, timeout… we couldn't check, which is not the
+            // same as "not an admin". Keep the session and offer a retry.
+            setIsAdmin(false)
+            setNetError(true)
+          }
         }
       } else {
         setIsAdmin(false)
@@ -54,9 +64,10 @@ export default function App() {
       setChecking(false)
     })
     return unsubscribe
-  }, [])
+  }, [attempt])
 
   function handleLogout() { signOut(auth) }
+  function handleRetry()  { setChecking(true); setAttempt(a => a + 1) }
 
   if (checking) {
     return (
@@ -82,6 +93,23 @@ export default function App() {
       <div style={{ position: 'relative', zIndex: 1, display: 'flex', minHeight: '100vh' }}>
         {!user
           ? <LoginPage />
+          : netError
+          ? (
+            <div style={{
+              flex: 1, display: 'flex', flexDirection: 'column',
+              alignItems: 'center', justifyContent: 'center', gap: 16, padding: 24, textAlign: 'center',
+            }}>
+              <h2 style={{ color: '#f0ecff' }}>Can't reach the server</h2>
+              <p style={{ color: '#9b8ec0', maxWidth: 420 }}>
+                You're signed in, but we couldn't check your admin access. Check your internet
+                connection (if other sites work, your network's DNS may be blocking Google services) and try again.
+              </p>
+              <div style={{ display: 'flex', gap: 10 }}>
+                <button className="btn btn-gold" onClick={handleRetry}>Try again</button>
+                <button className="btn btn-ghost" onClick={handleLogout}>Sign out</button>
+              </div>
+            </div>
+          )
           : !isAdmin
           ? (
             <div style={{
