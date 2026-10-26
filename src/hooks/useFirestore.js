@@ -2,7 +2,7 @@ import {
   collection, getDocs, addDoc, updateDoc, deleteDoc,
   doc, query, orderBy, Timestamp, setDoc, writeBatch,
 } from 'firebase/firestore'
-import { db } from '../firebase'
+import { db, auth } from '../firebase'
 
 // ─── Generic fetch ────────────────────────────────────────────────────────────
 export async function fetchCollection(col, ...queryConstraints) {
@@ -229,17 +229,27 @@ export async function getAllPushTokens() {
   return snap.docs.map(d => d.data().token).filter(Boolean)
 }
 
+// Token documents are keyed by the token with non-alphanumerics replaced by "_"
+// (same rule as the student app uses when it saves them).
+export const deletePushToken = token => deleteItem('pushTokens', token.replace(/[^a-zA-Z0-9]/g, '_'))
+
+// Returns { attempted, sent, failed, errors, deadTokens }.
+// `sent` = accepted by Expo for delivery; `failed` messages say why in `errors`.
 export async function sendPushNotification(title, body) {
   const tokens = await getAllPushTokens()
   if (!tokens.length) throw new Error('No registered devices yet')
+  const idToken = await auth.currentUser?.getIdToken()
+  if (!idToken) throw new Error('You are signed out. Sign in again.')
   const res = await fetch('/api/send-notification', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
     body: JSON.stringify({ tokens, title, body }),
   })
-  if (!res.ok) {
-    const err = await res.json()
-    throw new Error(err.error || 'Failed to send notifications')
-  }
-  return tokens.length
+  const data = await res.json().catch(() => ({}))
+  if (!res.ok) throw new Error(data.error || 'Failed to send notifications')
+
+  // Phones that uninstalled the app (or reinstalled, which makes a new token) can never
+  // receive anything again. Clean them out so the device count stays honest.
+  await Promise.allSettled((data.deadTokens || []).map(deletePushToken))
+  return data
 }

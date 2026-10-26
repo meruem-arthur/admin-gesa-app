@@ -32,13 +32,20 @@ export default function NotificationsPage() {
     if (!confirm(`Send "${title}" to all ${tokenCount ?? '?'} registered devices?`)) return
     setSending(true)
     try {
-      const count = await sendPushNotification(title.trim(), body.trim())
+      const r = await sendPushNotification(title.trim(), body.trim())
+      const count = r.sent
       const entry = { title: title.trim(), body: body.trim(), sentAt: new Date().toISOString(), devices: count }
       const updated = [entry, ...history].slice(0, 20)
       setHistory(updated)
       localStorage.setItem('notif_history', JSON.stringify(updated))
       setTitle(''); setBody('')
-      show(`✅ Sent to ${count} device${count === 1 ? '' : 's'}!`)
+      getAllPushTokens().then(t => setTokenCount(t.length)).catch(() => {})
+      if (r.failed === 0) {
+        show(`✅ Sent to ${count} device${count === 1 ? '' : 's'}!`)
+      } else {
+        const why = Object.entries(r.errors).map(([k, n]) => `${k} (${n})`).join(', ')
+        show(`Sent to ${count}, but ${r.failed} failed: ${why}`, 'error')
+      }
     } catch (err) { show(err.message, 'error') }
     finally { setSending(false) }
   }
