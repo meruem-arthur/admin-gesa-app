@@ -10,6 +10,8 @@ const EXPO_PUSH_URL = 'https://exp.host/--/api/v2/push/send'
 const PROJECT_ID    = process.env.FIREBASE_PROJECT_ID || 'gesa-app-2026'
 const MAX_PER_CALL  = 100            // Expo rejects more than 100 messages per request
 const MAX_TOKENS    = 5000
+// Screens the student app can open from a notification tap (must match the app's screen names).
+const ALLOWED_SCREENS = ['Home', 'Timetable', 'Materials', 'PastQ', 'Events', 'Notice', 'Exams', 'Business']
 
 async function isAdmin(authHeader) {
   const match = /^Bearer (.+)$/.exec(authHeader || '')
@@ -41,11 +43,17 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: 'Not authorised. Sign in to the dashboard as an admin.' })
   }
 
-  const { tokens, title, body } = req.body || {}
+  const { tokens, title, body, screen } = req.body || {}
   if (!Array.isArray(tokens) || !tokens.length) return res.status(400).json({ error: 'No tokens provided' })
   if (typeof title !== 'string' || typeof body !== 'string' || !title.trim() || !body.trim()) {
     return res.status(400).json({ error: 'Title and message are required' })
   }
+
+  if (screen !== undefined && screen !== null && screen !== '' && !ALLOWED_SCREENS.includes(screen)) {
+    return res.status(400).json({ error: 'Unknown screen' })
+  }
+  // Home is the default (just opens the app), so no data is attached for it.
+  const data = screen && screen !== 'Home' ? { screen } : undefined
 
   const valid = [...new Set(tokens.filter(isExpoToken))].slice(0, MAX_TOKENS)
   if (!valid.length) return res.status(400).json({ error: 'No valid push tokens' })
@@ -65,6 +73,7 @@ export default async function handler(req, res) {
           body: body.trim().slice(0, 200),
           channelId: 'default',      // the high-importance channel the app creates on Android
           priority: 'high',
+          ...(data ? { data } : {}),
         }))),
       })
       const json = await response.json().catch(() => ({}))

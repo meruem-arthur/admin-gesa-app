@@ -235,7 +235,7 @@ export const deletePushToken = token => deleteItem('pushTokens', token.replace(/
 
 // Returns { attempted, sent, failed, errors, deadTokens }.
 // `sent` = accepted by Expo for delivery; `failed` messages say why in `errors`.
-export async function sendPushNotification(title, body) {
+export async function sendPushNotification(title, body, screen = 'Home') {
   const tokens = await getAllPushTokens()
   if (!tokens.length) throw new Error('No registered devices yet')
   const idToken = await auth.currentUser?.getIdToken()
@@ -243,7 +243,7 @@ export async function sendPushNotification(title, body) {
   const res = await fetch('/api/send-notification', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
-    body: JSON.stringify({ tokens, title, body }),
+    body: JSON.stringify({ tokens, title, body, screen }),
   })
   const data = await res.json().catch(() => ({}))
   if (!res.ok) throw new Error(data.error || 'Failed to send notifications')

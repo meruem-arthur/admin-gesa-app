@@ -2,17 +2,31 @@ import React, { useState, useEffect } from 'react'
 import { getAllPushTokens, sendPushNotification } from '../hooks/useFirestore'
 import { useToast } from '../hooks/useToast'
 
+// value = screen name in the student app; label = what you see here
+const SCREEN_OPTIONS = [
+  { value: 'Home',      label: 'Home (just open the app)' },
+  { value: 'Timetable', label: 'Timetable' },
+  { value: 'Materials', label: 'Materials' },
+  { value: 'PastQ',     label: 'Past Questions' },
+  { value: 'Events',    label: 'Events' },
+  { value: 'Notice',    label: 'Announcements' },
+  { value: 'Exams',     label: 'Exams' },
+  { value: 'Business',  label: 'Business Hub' },
+]
+const screenLabel = v => SCREEN_OPTIONS.find(o => o.value === v)?.label || 'Home'
+
 const QUICK_TEMPLATES = [
-  { label: '📅 Exam reminder',    title: 'Exam Reminder',        body: 'Don\'t forget — your exam is coming up! Check the Exam Countdown in the GESA app.' },
-  { label: '📢 New announcement', title: 'New Announcement',     body: 'A new announcement has been posted. Open the GESA app to read it.' },
-  { label: '📚 New materials',    title: 'New Study Materials',  body: 'New lecture notes have been uploaded. Check the Materials section in the app.' },
-  { label: '📄 New past Q',       title: 'New Past Questions',   body: 'New past exam questions have been added. Find them in the Past Questions section.' },
-  { label: '🎉 Event reminder',   title: 'Upcoming GESA Event',  body: 'There\'s an upcoming GESA event! Check the Events section for details.' },
+  { label: '📅 Exam reminder',    screen: 'Exams',     title: 'Exam Reminder',        body: 'Don\'t forget — your exam is coming up! Check the Exam Countdown in the GESA app.' },
+  { label: '📢 New announcement', screen: 'Notice',    title: 'New Announcement',     body: 'A new announcement has been posted. Open the GESA app to read it.' },
+  { label: '📚 New materials',    screen: 'Materials', title: 'New Study Materials',  body: 'New lecture notes have been uploaded. Check the Materials section in the app.' },
+  { label: '📄 New past Q',       screen: 'PastQ',     title: 'New Past Questions',   body: 'New past exam questions have been added. Find them in the Past Questions section.' },
+  { label: '🎉 Event reminder',   screen: 'Events',    title: 'Upcoming GESA Event',  body: 'There\'s an upcoming GESA event! Check the Events section for details.' },
 ]
 
 export default function NotificationsPage() {
   const [title,       setTitle]       = useState('')
   const [body,        setBody]        = useState('')
+  const [screen,      setScreen]      = useState('Home')
   const [sending,     setSending]     = useState(false)
   const [tokenCount,  setTokenCount]  = useState(null)
   const [history,     setHistory]     = useState(() => {
@@ -24,7 +38,7 @@ export default function NotificationsPage() {
     getAllPushTokens().then(t => setTokenCount(t.length)).catch(() => setTokenCount(0))
   }, [])
 
-  function applyTemplate(t) { setTitle(t.title); setBody(t.body) }
+  function applyTemplate(t) { setTitle(t.title); setBody(t.body); setScreen(t.screen || 'Home') }
 
   async function handleSend(e) {
     e.preventDefault()
@@ -32,13 +46,13 @@ export default function NotificationsPage() {
     if (!confirm(`Send "${title}" to all ${tokenCount ?? '?'} registered devices?`)) return
     setSending(true)
     try {
-      const r = await sendPushNotification(title.trim(), body.trim())
+      const r = await sendPushNotification(title.trim(), body.trim(), screen)
       const count = r.sent
-      const entry = { title: title.trim(), body: body.trim(), sentAt: new Date().toISOString(), devices: count }
+      const entry = { title: title.trim(), body: body.trim(), sentAt: new Date().toISOString(), devices: count, screen }
       const updated = [entry, ...history].slice(0, 20)
       setHistory(updated)
       localStorage.setItem('notif_history', JSON.stringify(updated))
-      setTitle(''); setBody('')
+      setTitle(''); setBody(''); setScreen('Home')
       getAllPushTokens().then(t => setTokenCount(t.length)).catch(() => {})
       if (r.failed === 0) {
         show(`✅ Sent to ${count} device${count === 1 ? '' : 's'}!`)
@@ -94,6 +108,13 @@ export default function NotificationsPage() {
             <small style={{color:'var(--dim)',fontSize:11}}>{body.length}/200</small>
           </div>
 
+          <div className="form-group">
+            <label>When a student taps it, open</label>
+            <select value={screen} onChange={e=>setScreen(e.target.value)}>
+              {SCREEN_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+          </div>
+
           {/* Preview */}
           {(title || body) && (
             <div style={s.preview}>
@@ -128,12 +149,13 @@ export default function NotificationsPage() {
         <div className="card">
           <h2 style={s.formTitle}>📋 Send History (this browser)</h2>
           <table>
-            <thead><tr><th>Title</th><th>Message</th><th>Devices</th><th>Sent</th></tr></thead>
+            <thead><tr><th>Title</th><th>Message</th><th>Opens</th><th>Devices</th><th>Sent</th></tr></thead>
             <tbody>
               {history.map((h, i) => (
                 <tr key={i}>
                   <td style={{fontWeight:600}}>{h.title}</td>
                   <td style={{color:'var(--muted)',fontSize:12,maxWidth:300}}>{h.body}</td>
+                  <td style={{color:'var(--muted)',fontSize:12}}>{screenLabel(h.screen)}</td>
                   <td><span className="badge badge-green">{h.devices} devices</span></td>
                   <td style={{color:'var(--dim)',fontSize:12}}>
                     {new Date(h.sentAt).toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}
